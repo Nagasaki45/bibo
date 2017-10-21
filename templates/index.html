@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="entries">
+    <h1>Bibliography</h1>
+
+    <p>
+        <a class="btn btn-primary btn-lg" href="/add">Add new entry</a>
+    </p>
+
+    <input class="search" placeholder="Filter" />
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Author(s)</th>
+                <th>More</th>
+            </tr>
+        </thead>
+        <tbody class="list">
+            {% for entry in bib_data.entries.values() %}
+                <tr>
+                    <td>
+                        <a href="entry/{{ entry.key }}" class="key"><b>{{ entry.key }}</b></a>
+                        {% if entry.fields.tags %}
+                            <br>
+                            {% for tag in entry.fields.tags.split(',') %}
+                                <span class="tag badge badge-secondary">{{ tag }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td class="title">{{ entry.fields.title }}</td>
+                    <td class="year">{{ entry.fields.year }}</td>
+                    <td class="author">{{ entry.fields.author }}</td>
+                    <td>
+                        {% if entry.fields.file %}
+                            <button class="btn btn-primary" onclick="open_file('{{ entry.key }}')">Open file</button>
+                        {% endif %}
+                        {% if entry.fields.url %}
+                            <a class="btn btn-primary" href="{{ entry.fields.url }}">URL</button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </ul>
+</div>
+
+{% endblock %}

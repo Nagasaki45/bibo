@@ -1,0 +1,8 @@
+body {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+input.search {
+    width: 100%;
+}

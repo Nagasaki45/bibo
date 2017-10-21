@@ -1,118 +1,83 @@
+"""
+A reference manager with single source of truth: the .bib file.
+"""
+
 import os
 import re
 import subprocess
 import sys
 
-import click
+from flask import Flask, session, redirect, url_for, render_template, request
 from pybtex.database import parse_file
-import requests
 
-import dict_printer
-import scholar
+FILE_FIELD = re.compile('^:(?P<filepath>.*):[A-Z]+$')
 
-FILE_FIELD = re.compile('^:(?P<filepath>.*):PDF$')
+app = Flask(__name__)
+app.secret_key = "It's a secret"
 
-
-@click.group()
-@click.argument('bib_file', type=str)
-def cli(bib_file):
-    """
-    Simple command line bibliography manager.
-    """
-    cli.bib_data = parse_file(bib_file)
+filepath = sys.argv[1]
 
 
-@cli.command(name='import')
-@click.argument('pdf_file', type=click.File('r'))
-@click.option('--directory', type=click.Path(file_okay=False, writable=True),
-              default=None, help='Directory to move the PDF to.')
-def import_(pdf_file, directory):
-    """
-    Import new entry from file.
-    """
-    print(f'import {pdf_file} {directory}')
-    # settings = scholar.ScholarSettings()
-    # settings.set_citation_format(scholar.ScholarSettings.CITFORM_BIBTEX)
-    # querier = scholar.ScholarQuerier()
-    # querier.apply_settings(settings)
-    # query = scholar.SearchScholarQuery()
-    # query.set_words('transformed social interaction')
-    # querier.send_query(query)
-    # # scholar.txt(querier, with_globals=False)
-    # scholar.citation_export(querier)
-    text_search_url = 'https://search.crossref.org/dois?q=transformed+social+interaction'
-    doi_search_url = 'http://api.crossref.org/v1/works/{doi}/transform/application/x-bibtex'
-    resp = requests.get(text_search_url)
-    assert resp.status_code == 200, resp.status_code
-    for result in resp.json():
-        resp = requests.get(doi_search_url.format(doi=result['doi']))
-        assert resp.status_code == 200, resp.status_code
-        print(resp.content.decode('utf-8'))
+@app.route('/')
+def index():
+    bib_data = load_bib(filepath)
+    return render_template('index.html', bib_data=bib_data)
 
 
-@cli.command()
-@click.argument('search_query', type=str)
-def search(search_query):
-    """
-    Search an entry in the database.
-    """
-    for entry in search_gen(cli.bib_data, search_query):
-        click.echo(click.style(entry.key, fg='green'))
-        print(entry_pretty_format(entry))
+@app.route('/entry/<entry_key>')
+def entry(entry_key):
+    bib_data = load_bib(filepath)
+    entry = bib_data.entries[entry_key]
+    return render_template('entry.html', entry=entry)
 
 
-@cli.command()
-@click.argument('search_query', type=str)
-def read(search_query):
-    """
-    Open a PDF for reading using the system PDF reader.
-    """
-    entries = list(search_gen(cli.bib_data, search_query))
+@app.route('/entry/<entry_key>/open-file')
+def open_file(entry_key):
+    bib_data = load_bib(filepath)
+    entry = bib_data.entries[entry_key]
+    pdfpath = re.match(FILE_FIELD, entry.fields['file']).group('filepath')
+    open_file(pdfpath)
+    return 'Success!'
 
-    error = None
-    if not entries:
-        error = 'No entries found.'
-    elif len(entries) > 1:
-        error = 'Multiple entries found. Try to refine the search.'
 
-    if error:
-        click.echo(click.style(error, fg='red'))
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    if request.method == 'GET':
+        return render_template('import.html')
     else:
-        entry = entries[0]
-        filepath = re.match(FILE_FIELD, entry.fields['file']).group('filepath')
-        click.launch(filepath)
+        pdf = request.files['pdf']
+        # TODO do something
+        # pdf.save('/var/www/uploads/uploaded_file.txt')
+        return redirect(url_for('index'))
 
 
 # Internals
 
-def search_gen(bib_data, search_query):
-    """
-    Generate entries from the bib_data that matches the search term.
-    """
+def load_bib(filepath):
+    bib_data = parse_file(filepath)
+
+    # An awful hack to put the weirdly implemented author in the dict.
     for entry in bib_data.entries.values():
-        if entry_match_search(entry, search_query):
-            yield entry
+        try:
+            entry.fields['author'] = entry.fields['author']
+        except KeyError:
+            pass
+
+    return bib_data
 
 
-def entry_match_search(entry, search_query):
-    if text_match_search(entry.key, search_query):
-        return True
-    elif any(text_match_search(f, search_query) for f in entry.fields.values()):
-        return True
-    return False
-
-
-def text_match_search(text, search_query):
-    return search_query.lower() in text.lower()
-
-
-def entry_pretty_format(entry):
+def open_file(filepath):
     """
-    Pretty formatting an entry.
+    Open file with the default system app.
+    Copied from https://stackoverflow.com/a/435669/1224456
     """
-    as_dict = {key: val for key, val in entry.fields.items()}
-    try:  # The author field is weirdly implemented, hacking it in
-        as_dict['author'] = entry.fields['author']
-    except KeyError:
-        pass
-    return dict_printer.format(as_dict, ordered_keys=['author', 'year', 'title'])
+    if sys.platform.startswith('darwin'):
+        subprocess.call(('open', filepath))
+    elif os.name == 'nt':
+        os.startfile(filepath)
+    elif os.name == 'posix':
+        subprocess.call(('xdg-open', filepath))
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
