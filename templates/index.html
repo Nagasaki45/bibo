@@ -27,10 +27,11 @@
                     <td>
                         <a href="entry/{{ entry.key }}" class="key"><b>{{ entry.key }}</b></a>
                         {% if entry.fields.tags %}
-                            <br>
-                            {% for tag in entry.fields.tags.split(',') %}
-                                <span class="tag badge badge-secondary">{{ tag }}</span>
-                            {% endfor %}
+                            <div class="tag">
+                                {% for tag in entry.fields.tags.split(',') %}
+                                    <span class="badge badge-secondary">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
                         {% endif %}
                     </td>
                     <td class="title">{{ entry.fields.title }}</td>
