@@ -22,7 +22,11 @@ filepath = sys.argv[1]
 @app.route('/')
 def index():
     bib_data = parse_file(filepath)
-    return render_template('index.html', bib_data=bib_data)
+    return render_template(
+        'index.html',
+        bib_data=bib_data,
+        bib_file=os.path.basename(filepath),
+    )
 
 
 @app.route('/entry/<entry_key>')
