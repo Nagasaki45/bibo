@@ -29,6 +29,12 @@
 <div class="row">
     <div class="col-md">
         <table class="table">
+            {% if entry.fields.author %}
+                <tr>
+                    <td><b>author</b></td>
+                    <td>{{ entry.fields.author }}</td>
+                </tr>
+            {% endif %}
             {% for key, value in entry.fields.items() %}
                 {% if key not in ['review', 'tags'] %}  {# We show these already #}
                     <tr>

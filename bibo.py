@@ -2,6 +2,7 @@
 A reference manager with single source of truth: the .bib file.
 """
 
+import collections
 import os
 import re
 import subprocess
@@ -20,20 +21,20 @@ filepath = sys.argv[1]
 
 @app.route('/')
 def index():
-    bib_data = load_bib(filepath)
+    bib_data = parse_file(filepath)
     return render_template('index.html', bib_data=bib_data)
 
 
 @app.route('/entry/<entry_key>')
 def entry(entry_key):
-    bib_data = load_bib(filepath)
+    bib_data = parse_file(filepath)
     entry = bib_data.entries[entry_key]
     return render_template('entry.html', entry=entry)
 
 
 @app.route('/entry/<entry_key>/open-file')
 def open_file(entry_key):
-    bib_data = load_bib(filepath)
+    bib_data = parse_file(filepath)
     entry = bib_data.entries[entry_key]
     pdfpath = re.match(FILE_FIELD, entry.fields['file']).group('filepath')
     open_file(pdfpath)
@@ -42,29 +43,37 @@ def open_file(entry_key):
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():
+    bib_data = parse_file(filepath)
     if request.method == 'GET':
-        return render_template('import.html')
+        return render_template(
+            'add.html',
+            destination_path=default_destination_path(bib_data),
+        )
     else:
         pdf = request.files['pdf']
-        # TODO do something
-        # pdf.save('/var/www/uploads/uploaded_file.txt')
+        bib = request.form['bib'].replace('\r\n', '\n')
+        destination_path = request.form['destinationPath']
+
+        # Append bib entry to database and reload
+        with open(filepath, 'a') as f:
+            f.write('\n\n')
+            f.write(bib)
+        bib_data = parse_file(filepath)
+
+        # Add file field to entry
+        new_entry = bib_data.entries.values()[-1]
+        destination = os.path.join(destination_path, new_entry.key + '.pdf')
+        new_entry.fields['file'] = f':{destination}:PDF'
+        bib_data.to_file(filepath)
+
+        # Copy file to destination
+        if pdf:
+            pdf.save(destination)
+
         return redirect(url_for('index'))
 
 
 # Internals
-
-def load_bib(filepath):
-    bib_data = parse_file(filepath)
-
-    # An awful hack to put the weirdly implemented author in the dict.
-    for entry in bib_data.entries.values():
-        try:
-            entry.fields['author'] = entry.fields['author']
-        except KeyError:
-            pass
-
-    return bib_data
-
 
 def open_file(filepath):
     """
@@ -77,6 +86,21 @@ def open_file(filepath):
         os.startfile(filepath)
     elif os.name == 'posix':
         subprocess.call(('xdg-open', filepath))
+
+
+def default_destination_path(bib_data):
+    """
+    A heuristic to get the folder with all other files from bib, using majority
+    vote.
+    """
+    counter = collections.Counter()
+    for entry in bib_data.entries.values():
+        if not 'file' in entry.fields:
+            continue
+        _, full_path, _ = entry.fields['file'].split(':')
+        path = os.path.dirname(full_path)
+        counter[path] += 1
+    return sorted(counter, reverse=True)[0]
 
 
 if __name__ == '__main__':
