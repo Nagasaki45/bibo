@@ -14,6 +14,17 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/add">Add new entry</a>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="sortByDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Sort by
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="sortByDropdown">
+                        <button class="sort dropdown-item" data-sort="key">Key</button>
+                        <button class="sort dropdown-item" data-sort="author">Author</button>
+                        <button class="sort dropdown-item" data-sort="title">Title</button>
+                        <button class="sort dropdown-item" data-sort="year">Year</button>
+                    </div>
+                </li>
             </ul>
             <form class="form-inline">
                 <input class="search form-control mr-sm-2" placeholder="Filter entries" autofocus />
