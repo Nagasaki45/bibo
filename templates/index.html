@@ -4,7 +4,10 @@
 
 <div id="entries">
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">{{ bib_file }}</a>
+        <a class="navbar-brand" href="/">
+            <img src="/static/assets/logo.svg" width="30" height="30" alt="Bibo logo">
+            {{ bib_file }}
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -24,6 +27,9 @@
                         <button class="sort dropdown-item" data-sort="title">Title</button>
                         <button class="sort dropdown-item" data-sort="year">Year</button>
                     </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/Nagasaki45/bibo">About</a>
                 </li>
             </ul>
             <form class="form-inline">
