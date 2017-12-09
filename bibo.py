@@ -58,20 +58,20 @@ def add():
         bib = request.form['bib'].replace('\r\n', '\n')
         destination_path = request.form['destinationPath']
 
-        # Append bib entry to database and reload
+        # Append bib entry to database
         with open(filepath, 'a') as f:
             f.write('\n\n')
             f.write(bib)
-        bib_data = parse_file(filepath)
 
-        # Add file field to entry
-        new_entry = bib_data.entries.values()[-1]
-        destination = os.path.join(destination_path, new_entry.key + '.pdf')
-        new_entry.fields['file'] = f':{destination}:PDF'
-        bib_data.to_file(filepath)
-
-        # Copy file to destination
         if pdf:
+            # Add file field to entry
+            bib_data = parse_file(filepath)
+            new_entry = bib_data.entries.values()[-1]
+            destination = os.path.join(destination_path, new_entry.key + '.pdf')
+            new_entry.fields['file'] = f':{destination}:PDF'
+            bib_data.to_file(filepath)
+
+            # Copy file to destination
             pdf.save(destination)
 
         return redirect(url_for('index'))
