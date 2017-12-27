@@ -85,11 +85,11 @@ def open_file(filepath):
     Copied from https://stackoverflow.com/a/435669/1224456
     """
     if sys.platform.startswith('darwin'):
-        subprocess.call(('open', filepath))
+        subprocess.Popen(('open', filepath))
     elif os.name == 'nt':
         os.startfile(filepath)
     elif os.name == 'posix':
-        subprocess.call(('xdg-open', filepath))
+        subprocess.Popen(('xdg-open', filepath))
 
 
 def default_destination_path(bib_data):
