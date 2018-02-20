@@ -107,5 +107,9 @@ def default_destination_path(bib_data):
     return sorted(counter, reverse=True)[0]
 
 
+def main():
+    app.run()
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    main()
