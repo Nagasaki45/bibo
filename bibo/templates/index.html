@@ -52,7 +52,10 @@
             {% for entry in bib_data.entries.values() %}
                 <tr>
                     <td>
-                        <a href="entry/{{ entry.key }}" class="key"><b>{{ entry.key }}</b></a>
+                        <a href="" data-toggle="modal" data-target="#{{ entry.key }}" class="key">
+                            <b>{{ entry.key }}</b>
+                        </a>
+                        {% include "includes/entry_modal.html" %}
                         {% if entry.fields.tags %}
                             <div class="tag">
                                 {% for tag in entry.fields.tags.split(',') %}

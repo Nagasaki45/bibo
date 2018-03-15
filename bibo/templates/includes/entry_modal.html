@@ -1,0 +1,31 @@
+<div class="modal fade" id="{{ entry.key }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ entry.key }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <table class="table">
+            {% if entry.fields.author %}
+                <tr>
+                    <td><b>author</b></td>
+                    <td>{{ entry.fields.author }}</td>
+                </tr>
+            {% endif %}
+            {% for key, value in entry.fields.items() %}
+                <tr>
+                    <td><b>{{ key }}</b></td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>
+

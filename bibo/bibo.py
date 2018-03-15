@@ -29,13 +29,6 @@ def index():
     )
 
 
-@app.route('/entry/<entry_key>')
-def entry(entry_key):
-    bib_data = parse_file(filepath)
-    entry = bib_data.entries[entry_key]
-    return render_template('entry.html', entry=entry)
-
-
 @app.route('/entry/<entry_key>/open-file')
 def open_file(entry_key):
     bib_data = parse_file(filepath)
