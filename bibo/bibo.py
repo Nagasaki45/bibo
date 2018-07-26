@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 from flask import Flask, session, redirect, url_for, render_template, request
-from pybtex.database import parse_file
+import pybibs
 
 FILE_FIELD = re.compile('^:(?P<filepath>.*):[A-Z]+$')
 
@@ -21,7 +21,7 @@ filepath = sys.argv[1]
 
 @app.route('/')
 def index():
-    bib_data = parse_file(filepath)
+    bib_data = pybibs.read_file(filepath)
     return render_template(
         'index.html',
         bib_data=bib_data,
@@ -31,41 +31,39 @@ def index():
 
 @app.route('/entry/<entry_key>/open-file')
 def open_file(entry_key):
-    bib_data = parse_file(filepath)
-    entry = bib_data.entries[entry_key]
-    pdfpath = re.match(FILE_FIELD, entry.fields['file']).group('filepath')
+    bib_data = pybibs.read_file(filepath)
+    entry = bib_data[entry_key]
+    pdfpath = re.match(FILE_FIELD, entry['file']).group('filepath')
     open_file(pdfpath)
     return 'Success!'
 
 
 @app.route('/add', methods=['GET', 'POST'])
 def add():
-    bib_data = parse_file(filepath)
+    bib_data = pybibs.read_file(filepath)
+
     if request.method == 'GET':
         return render_template(
             'add.html',
             destination_path=default_destination_path(bib_data),
         )
+
     else:
         pdf = request.files['pdf']
-        bib = request.form['bib'].replace('\r\n', '\n')
+        bib = request.form['bib']
         destination_path = request.form['destinationPath']
-
-        # Append bib entry to database
-        with open(filepath, 'a') as f:
-            f.write('\n\n')
-            f.write(bib)
+        print(bib)
+        new_entry = pybibs.read_entry_string(bib.replace('\r\n', '\n'))
+        print(new_entry)
 
         if pdf:
-            # Add file field to entry
-            bib_data = parse_file(filepath)
-            new_entry = bib_data.entries.values()[-1]
-            destination = os.path.join(destination_path, new_entry.key + '.pdf')
-            new_entry.fields['file'] = f':{destination}:PDF'
-            bib_data.to_file(filepath)
-
-            # Copy file to destination
+            destination = os.path.join(destination_path, new_entry['key'] + '.pdf')
+            new_entry['file'] = f':{destination}:PDF'
             pdf.save(destination)
+
+        # Add the new entry to the database
+        bib_data[new_entry['key']] = new_entry
+        pybibs.write_file(bib_data, filepath)
 
         return redirect(url_for('index'))
 
@@ -91,10 +89,10 @@ def default_destination_path(bib_data):
     vote.
     """
     counter = collections.Counter()
-    for entry in bib_data.entries.values():
-        if not 'file' in entry.fields:
+    for entry in bib_data.values():
+        if not 'file' in entry:
             continue
-        _, full_path, _ = entry.fields['file'].split(':')
+        _, full_path, _ = entry['file'].split(':')
         path = os.path.dirname(full_path)
         counter[path] += 1
     return sorted(counter, reverse=True)[0]

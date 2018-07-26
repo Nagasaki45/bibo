@@ -49,30 +49,30 @@
             </tr>
         </thead>
         <tbody class="list">
-            {% for entry in bib_data.entries.values() %}
+            {% for entry in bib_data.values() %}
                 <tr>
                     <td>
                         <a href="" data-toggle="modal" data-target="#{{ entry.key }}" class="key">
                             <b>{{ entry.key }}</b>
                         </a>
                         {% include "includes/entry_modal.html" %}
-                        {% if entry.fields.tags %}
+                        {% if entry.tags %}
                             <div class="tag">
-                                {% for tag in entry.fields.tags.split(',') %}
+                                {% for tag in entry.tags.split(',') %}
                                     <span class="badge badge-secondary">{{ tag }}</span>
                                 {% endfor %}
                             </div>
                         {% endif %}
                     </td>
-                    <td class="title">{{ entry.fields.title }}</td>
-                    <td class="year">{{ entry.fields.year }}</td>
-                    <td class="author">{{ entry.fields.author }}</td>
+                    <td class="title">{{ entry.title }}</td>
+                    <td class="year">{{ entry.year }}</td>
+                    <td class="author">{{ entry.author }}</td>
                     <td>
-                        {% if entry.fields.file %}
+                        {% if entry.file %}
                             <button class="btn btn-primary" onclick="open_file('{{ entry.key }}')">Open file</button>
                         {% endif %}
-                        {% if entry.fields.url %}
-                            <a class="btn btn-primary" href="{{ entry.fields.url }}" target="_blank">URL</button>
+                        {% if entry.url %}
+                            <a class="btn btn-primary" href="{{ entry.url }}" target="_blank">URL</button>
                         {% endif %}
                     </td>
                 </tr>

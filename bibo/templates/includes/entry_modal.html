@@ -10,13 +10,13 @@
       <div class="modal-body">
 
         <table class="table">
-            {% if entry.fields.author %}
+            {% if entry.author %}
                 <tr>
                     <td><b>author</b></td>
-                    <td>{{ entry.fields.author }}</td>
+                    <td>{{ entry.author }}</td>
                 </tr>
             {% endif %}
-            {% for key, value in entry.fields.items() %}
+            {% for key, value in entry.items() %}
                 <tr>
                     <td><b>{{ key }}</b></td>
                     <td>{{ value }}</td>
