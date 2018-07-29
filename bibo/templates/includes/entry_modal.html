@@ -2,7 +2,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ entry.key }}</h5>
+        <h5 class="modal-title">{{ entry.key }} ({{ entry.type }})</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -10,17 +10,13 @@
       <div class="modal-body">
 
         <table class="table">
-            {% if entry.author %}
-                <tr>
-                    <td><b>author</b></td>
-                    <td>{{ entry.author }}</td>
-                </tr>
-            {% endif %}
             {% for key, value in entry.items() %}
-                <tr>
-                    <td><b>{{ key }}</b></td>
-                    <td>{{ value }}</td>
-                </tr>
+                {% if key not in ['key', 'type'] %}
+                    <tr>
+                        <td><b>{{ key }}</b></td>
+                        <td>{{ value }}</td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         </table>
 
