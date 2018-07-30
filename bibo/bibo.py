@@ -52,9 +52,7 @@ def add():
         pdf = request.files['pdf']
         bib = request.form['bib']
         destination_path = request.form['destinationPath']
-        print(bib)
         new_entry = pybibs.read_entry_string(bib.replace('\r\n', '\n'))
-        print(new_entry)
 
         if pdf:
             destination = os.path.join(destination_path, new_entry['key'] + '.pdf')
