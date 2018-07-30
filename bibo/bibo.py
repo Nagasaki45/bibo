@@ -38,6 +38,25 @@ def open_file(entry_key):
     return 'Success!'
 
 
+@app.route('/entry/<entry_key>/field-edit', methods=['POST'])
+def field_edit(entry_key):
+    bib_data = pybibs.read_file(filepath)
+    entry = bib_data[entry_key]
+    for key, val in request.form.items():
+        entry[key] = val
+    pybibs.write_file(bib_data, filepath)
+    return 'Success!'
+
+
+@app.route('/entry/<entry_key>/field-remove', methods=['POST'])
+def field_remove(entry_key):
+    bib_data = pybibs.read_file(filepath)
+    entry = bib_data[entry_key]
+    del entry[request.form['field']]
+    pybibs.write_file(bib_data, filepath)
+    return 'Success!'
+
+
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     bib_data = pybibs.read_file(filepath)

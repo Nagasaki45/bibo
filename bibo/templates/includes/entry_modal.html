@@ -14,7 +14,11 @@
                 {% if key not in ['key', 'type'] %}
                     <tr>
                         <td><b>{{ key }}</b></td>
-                        <td>{{ value }}</td>
+                        <td id="{{ entry.key }}-{{ key }}">{{ value }}</td>
+                        <td>
+                            <button onclick="fieldEdit('{{ entry.key }}', '{{ key }}')" type="button" class="btn btn-sm btn-outline-primary">✎ edit</button>
+                            <button onclick="fieldRemove('{{ entry.key }}', '{{ key }}')" type="button" class="btn btn-sm btn-outline-danger">✗ delete</button>
+                        </td>
                     </tr>
                 {% endif %}
             {% endfor %}
