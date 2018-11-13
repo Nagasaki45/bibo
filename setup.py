@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='bibo',
-    version='0.0.2',
+    version='0.0.3',
     description='A reference manager with single source of truth: the .bib file',
     long_description=long_description,
     url='https://github.com/Nagasaki45/bibo',
@@ -45,6 +45,7 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 
     # This field adds keywords for your project which will appear on the
@@ -71,7 +72,7 @@ setup(
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'flask',
+        'click',
         'pybibs',
     ],
 
@@ -87,7 +88,7 @@ setup(
     # executes the function `main` from this package when invoked:
     entry_points={
         'console_scripts': [
-            'bibo=bibo.bibo:main',
+            'bibo=bibo.bibo:cli',
         ],
     },
 )

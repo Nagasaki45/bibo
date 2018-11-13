@@ -5,87 +5,97 @@ A reference manager with single source of truth: the .bib file.
 import collections
 import os
 import re
+import shutil
 import subprocess
 import sys
 
-from flask import Flask, session, redirect, url_for, render_template, request
+import click
 import pybibs
 
+from . import editor_input
+
 FILE_FIELD = re.compile('^:(?P<filepath>.*):[A-Z]+$')
+PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
+                         dir_okay=False)
 
-app = Flask(__name__)
-app.secret_key = "It's a secret"
-
-filepath = sys.argv[1]
-
-
-@app.route('/')
-def index():
-    bib_data = pybibs.read_file(filepath)
-    return render_template(
-        'index.html',
-        bib_data=bib_data,
-        bib_file=os.path.basename(filepath),
-    )
+@click.group()
+@click.option('--database', envvar='BIBO_DATABASE', help='A .bib file',
+              required=True, type=PATH_OPTION)
+@click.pass_context
+def cli(ctx, database):
+    ctx.ensure_object(dict)
+    ctx.obj['database'] = database
+    ctx.obj['data'] = pybibs.read_file(database)
 
 
-@app.route('/entry/<entry_key>/open-file')
-def open_file(entry_key):
-    bib_data = pybibs.read_file(filepath)
-    entry = bib_data[entry_key]
+@cli.command()
+@click.argument('search_term')
+@click.pass_context
+def list(ctx, search_term):
+    for entry in search(ctx.obj['data'], search_term):
+        click.echo(format_entry(entry))
+
+
+@cli.command()
+@click.argument('search_term')
+@click.pass_context
+def open(ctx, search_term):
+    search_results = search(ctx.obj['data'], search_term)
+    try:
+        entry = next(search_results)
+    except StopIteration:
+        click.echo('No results found')
+        sys.exit(1)
+    try:
+        next(search_results)
+    except StopIteration:
+        pass
+    else:
+        click.echo('Search returned multiple results')
+        sys.exit(1)
+
+    if not 'file' in entry:
+        click.echo('No file is associated with this entry')
+        sys.exit(1)
+
     pdfpath = re.match(FILE_FIELD, entry['file']).group('filepath')
     open_file(pdfpath)
-    return 'Success!'
+ 
+ 
+@cli.command()
+@click.option('--pdf', help='PDF to link to this entry',
+              type=click.Path(exists=True, readable=True, dir_okay=False))
+@click.pass_context
+def add(ctx, pdf):
+    data = ctx.obj['data']
+    bib = editor_input.editor_input()
+    new_entry = pybibs.read_entry_string(bib)
 
+    if pdf:
+        destination_path = default_destination_path(data)
+        destination = os.path.join(destination_path, new_entry['key'] + '.pdf')
+        new_entry['file'] = f':{destination}:PDF'
+        shutil.copy(pdf, destination)
 
-@app.route('/entry/<entry_key>/field-edit', methods=['POST'])
-def field_edit(entry_key):
-    bib_data = pybibs.read_file(filepath)
-    entry = bib_data[entry_key]
-    for key, val in request.form.items():
-        entry[key] = val
-    pybibs.write_file(bib_data, filepath)
-    return 'Success!'
-
-
-@app.route('/entry/<entry_key>/field-remove', methods=['POST'])
-def field_remove(entry_key):
-    bib_data = pybibs.read_file(filepath)
-    entry = bib_data[entry_key]
-    del entry[request.form['field']]
-    pybibs.write_file(bib_data, filepath)
-    return 'Success!'
-
-
-@app.route('/add', methods=['GET', 'POST'])
-def add():
-    bib_data = pybibs.read_file(filepath)
-
-    if request.method == 'GET':
-        return render_template(
-            'add.html',
-            destination_path=default_destination_path(bib_data),
-        )
-
-    else:
-        pdf = request.files['pdf']
-        bib = request.form['bib']
-        destination_path = request.form['destinationPath']
-        new_entry = pybibs.read_entry_string(bib.replace('\r\n', '\n'))
-
-        if pdf:
-            destination = os.path.join(destination_path, new_entry['key'] + '.pdf')
-            new_entry['file'] = f':{destination}:PDF'
-            pdf.save(destination)
-
-        # Add the new entry to the database
-        bib_data[new_entry['key']] = new_entry
-        pybibs.write_file(bib_data, filepath)
-
-        return redirect(url_for('index'))
+    # Add the new entry to the database
+    data[new_entry['key']] = new_entry
+    pybibs.write_file(data, ctx.obj['database'])
 
 
 # Internals
+
+
+def search(data, search_term):
+    for key, fields in data.items():
+        for field in fields.values():
+            if search_term.lower() in field.lower():
+                yield fields
+                break
+
+
+def format_entry(fields):
+    return fields['key']
+
 
 def open_file(filepath):
     """
@@ -100,13 +110,13 @@ def open_file(filepath):
         subprocess.Popen(('xdg-open', filepath))
 
 
-def default_destination_path(bib_data):
+def default_destination_path(data):
     """
     A heuristic to get the folder with all other files from bib, using majority
     vote.
     """
     counter = collections.Counter()
-    for entry in bib_data.values():
+    for entry in data.values():
         if not 'file' in entry:
             continue
         _, full_path, _ = entry['file'].split(':')
@@ -115,9 +125,5 @@ def default_destination_path(bib_data):
     return sorted(counter, reverse=True)[0]
 
 
-def main():
-    app.run()
-
-
 if __name__ == '__main__':
-    main()
+    cli()
