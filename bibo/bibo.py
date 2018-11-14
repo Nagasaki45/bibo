@@ -12,7 +12,6 @@ import sys
 import click
 import pybibs
 
-from . import editor_input
 
 FILE_FIELD = re.compile('^:(?P<filepath>.*):[A-Z]+$')
 PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
@@ -68,7 +67,7 @@ def open(ctx, search_term):
 @click.pass_context
 def add(ctx, pdf):
     data = ctx.obj['data']
-    bib = editor_input.editor_input()
+    bib = click.edit()
     new_entry = pybibs.read_entry_string(bib)
 
     if pdf:
