@@ -52,6 +52,18 @@ def open(ctx, search_term):
 
     pdfpath = re.match(FILE_FIELD, entry['file']).group('filepath')
     open_file(pdfpath)
+
+@cli.command()
+@click.argument('search_term')
+@click.pass_context
+def show(ctx, search_term):
+    try:
+        entry = query.get(ctx.obj['data'], search_term)
+    except query.QueryException as e:
+        click.echo(str(e))
+        sys.exit(1)
+
+    click.echo(pybibs.write_string({entry['key']: entry}))
  
  
 @cli.command()
