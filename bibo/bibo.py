@@ -12,6 +12,7 @@ import sys
 import click
 import pybibs
 
+from . import query
 
 FILE_FIELD = re.compile('^:(?P<filepath>.*):[A-Z]+$')
 PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
@@ -31,7 +32,7 @@ def cli(ctx, database):
 @click.argument('search_term')
 @click.pass_context
 def list(ctx, search_term):
-    for entry in search(ctx.obj['data'], search_term):
+    for entry in query.search(ctx.obj['data'], search_term):
         click.echo(format_entry(entry))
 
 
@@ -39,18 +40,10 @@ def list(ctx, search_term):
 @click.argument('search_term')
 @click.pass_context
 def open(ctx, search_term):
-    search_results = search(ctx.obj['data'], search_term)
     try:
-        entry = next(search_results)
-    except StopIteration:
-        click.echo('No results found')
-        sys.exit(1)
-    try:
-        next(search_results)
-    except StopIteration:
-        pass
-    else:
-        click.echo('Search returned multiple results')
+        entry = query.get(ctx.obj['data'], search_term)
+    except query.QueryException as e:
+        click.echo(str(e))
         sys.exit(1)
 
     if not 'file' in entry:
@@ -82,15 +75,6 @@ def add(ctx, pdf):
 
 
 # Internals
-
-
-def search(data, search_term):
-    for key, fields in data.items():
-        for field in fields.values():
-            if search_term.lower() in field.lower():
-                yield fields
-                break
-
 
 def format_entry(fields):
     return fields['key']
