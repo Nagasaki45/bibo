@@ -77,7 +77,17 @@ def add(ctx, pdf):
 # Internals
 
 def format_entry(fields):
-    return fields['key']
+    header = [click.style(fields['key'], fg='green')]
+    if fields.get('tags'):
+        header.append(click.style(fields['tags'], fg='cyan'))
+    if fields.get('file'):
+        header.append('📁')
+    if fields.get('url'):
+        header.append('🔗')
+    return '\n'.join([
+        ' '.join(header),
+        '''{author} ({year}). {title}'''.format_map(fields)
+    ])
 
 
 def open_file(filepath):
