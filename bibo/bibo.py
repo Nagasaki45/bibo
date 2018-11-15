@@ -89,8 +89,9 @@ def add(ctx, pdf):
 
 @cli.command()
 @click.argument('search_term')
+@click.option('--field', help='Field to remove')
 @click.pass_context
-def remove(ctx, search_term):
+def remove(ctx, search_term, field):
     data = ctx.obj['data']
     try:
         entry = query.get(data, search_term)
@@ -98,14 +99,10 @@ def remove(ctx, search_term):
         click.echo(str(e))
         sys.exit(1)
 
-    file_field = entry.get('file')
-    if file_field:
-        try:
-            os.remove(file_field_to_filepath(file_field))
-        except FileNotFoundError:
-            click.echo('This entry\'s file was missing')
-
-    del data[entry['key']]
+    if field is None:
+        remove_entry(data, entry)
+    else:
+        del data[entry['key']][field]
 
     pybibs.write_file(data, ctx.obj['database'])
 
@@ -156,6 +153,20 @@ def default_destination_path(data):
 
 def file_field_to_filepath(file_field):
     return re.match(FILE_FIELD, file_field).group('filepath')
+
+
+def remove_entry(data, entry):
+    '''
+    Remove an entry in place.
+    '''
+    file_field = entry.get('file')
+    if file_field:
+        try:
+            os.remove(file_field_to_filepath(file_field))
+        except FileNotFoundError:
+            click.echo('This entry\'s file was missing')
+
+    del data[entry['key']]
 
 
 if __name__ == '__main__':
