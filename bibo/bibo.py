@@ -50,7 +50,7 @@ def open(ctx, search_term):
         click.echo('No file is associated with this entry')
         sys.exit(1)
 
-    pdfpath = re.match(FILE_FIELD, entry['file']).group('filepath')
+    pdfpath = file_field_to_filepath(entry['file'])
     open_file(pdfpath)
 
 @cli.command()
@@ -83,6 +83,29 @@ def add(ctx, pdf):
 
     # Add the new entry to the database
     data[new_entry['key']] = new_entry
+    pybibs.write_file(data, ctx.obj['database'])
+
+
+@cli.command()
+@click.argument('search_term')
+@click.pass_context
+def remove(ctx, search_term):
+    data = ctx.obj['data']
+    try:
+        entry = query.get(data, search_term)
+    except query.QueryException as e:
+        click.echo(str(e))
+        sys.exit(1)
+
+    file_field = entry.get('file')
+    if file_field:
+        try:
+            os.remove(file_field_to_filepath(file_field))
+        except FileNotFoundError:
+            click.echo('This entry\'s file was missing')
+
+    del data[entry['key']]
+
     pybibs.write_file(data, ctx.obj['database'])
 
 
@@ -128,6 +151,10 @@ def default_destination_path(data):
         path = os.path.dirname(full_path)
         counter[path] += 1
     return sorted(counter, reverse=True)[0]
+
+
+def file_field_to_filepath(file_field):
+    return re.match(FILE_FIELD, file_field).group('filepath')
 
 
 if __name__ == '__main__':
