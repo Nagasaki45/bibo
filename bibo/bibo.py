@@ -11,6 +11,7 @@ import sys
 
 import click
 import pybibs
+import pyperclip
 
 from . import query
 
@@ -72,7 +73,7 @@ def show(ctx, search_term):
 @click.pass_context
 def add(ctx, pdf):
     data = ctx.obj['data']
-    bib = click.edit()
+    bib = click.edit(text=pyperclip.paste())
     new_entry = pybibs.read_entry_string(bib)
 
     if pdf:

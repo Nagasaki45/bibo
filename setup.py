@@ -74,6 +74,7 @@ setup(
     install_requires=[
         'click',
         'pybibs',
+        'pyperclip',
     ],
 
     # To include the templates and static files in the distribution.
