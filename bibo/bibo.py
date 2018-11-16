@@ -36,12 +36,17 @@ def cli(ctx, database):
     ctx.obj['data'] = pybibs.read_file(database)
 
 
-@cli.command(short_help='List all entries.')
+@cli.command(short_help='List entries.')
+@click.option('--raw', is_flag=True, help='Format as raw .bib entries')
 @click.argument('search_term')
 @click.pass_context
-def list(ctx, search_term):
+def list(ctx, search_term, raw):
     for entry in query.search(ctx.obj['data'], search_term):
-        click.echo(format_entry(entry))
+        if raw:
+            txt = pybibs.write_string({entry['key']: entry})
+        else:
+            txt = format_entry(entry)
+        click.echo(txt)
 
 
 @cli.command(short_help='Open the PDF linked to an entry.')
@@ -61,19 +66,7 @@ def open(ctx, search_term):
     pdfpath = file_field_to_filepath(entry['file'])
     open_file(pdfpath)
 
-@cli.command(short_help='Show the raw .bib of an entry.')
-@click.argument('search_term')
-@click.pass_context
-def show(ctx, search_term):
-    try:
-        entry = query.get(ctx.obj['data'], search_term)
-    except query.QueryException as e:
-        click.echo(str(e))
-        sys.exit(1)
 
-    click.echo(pybibs.write_string({entry['key']: entry}))
- 
- 
 @cli.command(short_help='Add a new entry.')
 @PDF_OPTION
 @click.pass_context
