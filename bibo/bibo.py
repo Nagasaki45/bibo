@@ -104,7 +104,10 @@ def remove(ctx, search_term, field):
     if field is None:
         remove_entry(data, entry)
     else:
-        del data[entry['key']][field]
+        if field in entry:
+            del entry[field]
+        else:
+            click.echo('No such field')
 
     pybibs.write_file(data, ctx.obj['database'])
 
