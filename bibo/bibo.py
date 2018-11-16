@@ -18,6 +18,11 @@ from . import query
 FILE_FIELD = re.compile('^:(?P<filepath>.*):[A-Z]+$')
 PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
                          dir_okay=False)
+PDF_OPTION = click.option(
+    '--pdf',
+    help='PDF to link to this entry',
+    type=click.Path(exists=True, readable=True, dir_okay=False),
+)
 
 @click.group()
 @click.option('--database', envvar='BIBO_DATABASE', help='A .bib file',
@@ -68,22 +73,17 @@ def show(ctx, search_term):
  
  
 @cli.command()
-@click.option('--pdf', help='PDF to link to this entry',
-              type=click.Path(exists=True, readable=True, dir_okay=False))
+@PDF_OPTION
 @click.pass_context
 def add(ctx, pdf):
     data = ctx.obj['data']
     bib = click.edit(text=pyperclip.paste())
-    new_entry = pybibs.read_entry_string(bib)
+    entry = pybibs.read_entry_string(bib)
+    data[entry['key']] = entry
 
     if pdf:
-        destination_path = default_destination_path(data)
-        destination = os.path.join(destination_path, new_entry['key'] + '.pdf')
-        new_entry['file'] = f':{destination}:PDF'
-        shutil.copy(pdf, destination)
+        set_pdf(data, entry, pdf)
 
-    # Add the new entry to the database
-    data[new_entry['key']] = new_entry
     pybibs.write_file(data, ctx.obj['database'])
 
 
@@ -103,6 +103,38 @@ def remove(ctx, search_term, field):
         remove_entry(data, entry)
     else:
         del data[entry['key']][field]
+
+    pybibs.write_file(data, ctx.obj['database'])
+
+
+@cli.command()
+@click.argument('search_term')
+@click.option('--type', help='Set the type')
+@click.option('--key', help='Set the key')
+@PDF_OPTION
+@click.option('--field', help='Field to edit')
+@click.pass_context
+def edit(ctx, search_term, key, field, pdf, **kwargs):
+    type_ = kwargs.pop('type')
+
+    data = ctx.obj['data']
+    try:
+        entry = query.get(data, search_term)
+    except query.QueryException as e:
+        click.echo(str(e))
+        sys.exit(1)
+
+    if type_:
+        entry['type'] = type_
+    if key:
+        entry['key'] = key
+        data[key] = entry
+    if pdf:
+        set_pdf(data, entry, pdf)
+    if field:
+        current_value = entry.get(field, '')
+        updated_value = click.edit(text=current_value).strip()
+        entry[field] = updated_value
 
     pybibs.write_file(data, ctx.obj['database'])
 
@@ -167,6 +199,13 @@ def remove_entry(data, entry):
             click.echo('This entry\'s file was missing')
 
     del data[entry['key']]
+
+
+def set_pdf(data, entry, pdf):
+    destination_path = default_destination_path(data)
+    destination = os.path.join(destination_path, entry['key'] + '.pdf')
+    entry['file'] = f':{destination}:PDF'
+    shutil.copy(pdf, destination)
 
 
 if __name__ == '__main__':
