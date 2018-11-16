@@ -88,19 +88,15 @@ def add(ctx, pdf):
 @click.pass_context
 def remove(ctx, search_term, field):
     data = ctx.obj['data']
-    try:
-        entry = query.get(data, search_term)
-    except query.QueryException as e:
-        click.echo(str(e))
-        sys.exit(1)
 
-    if field is None:
-        remove_entry(data, entry)
-    else:
-        if field in entry:
-            del entry[field]
+    for entry in query.search(data, search_term):
+        if field is None:
+            remove_entry(data, entry)
         else:
-            click.echo('No such field')
+            if field in entry:
+                del entry[field]
+            else:
+                click.echo('No such field')
 
     pybibs.write_file(data, ctx.obj['database'])
 
