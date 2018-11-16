@@ -1,5 +1,6 @@
 """
-A reference manager with single source of truth: the .bib file.
+Command line reference manager with a single source of truth: the .bib file.
+Inspired by beets.
 """
 
 import collections
@@ -20,12 +21,13 @@ PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
                          dir_okay=False)
 PDF_OPTION = click.option(
     '--pdf',
-    help='PDF to link to this entry',
+    help='PDF to link to this entry.',
     type=click.Path(exists=True, readable=True, dir_okay=False),
 )
 
-@click.group()
-@click.option('--database', envvar='BIBO_DATABASE', help='A .bib file',
+
+@click.group(help=__doc__)
+@click.option('--database', envvar='BIBO_DATABASE', help='A .bib file.',
               required=True, type=PATH_OPTION)
 @click.pass_context
 def cli(ctx, database):
@@ -34,7 +36,7 @@ def cli(ctx, database):
     ctx.obj['data'] = pybibs.read_file(database)
 
 
-@cli.command()
+@cli.command(short_help='List all entries.')
 @click.argument('search_term')
 @click.pass_context
 def list(ctx, search_term):
@@ -42,7 +44,7 @@ def list(ctx, search_term):
         click.echo(format_entry(entry))
 
 
-@cli.command()
+@cli.command(short_help='Open the PDF linked to an entry.')
 @click.argument('search_term')
 @click.pass_context
 def open(ctx, search_term):
@@ -59,7 +61,7 @@ def open(ctx, search_term):
     pdfpath = file_field_to_filepath(entry['file'])
     open_file(pdfpath)
 
-@cli.command()
+@cli.command(short_help='Show the raw .bib of an entry.')
 @click.argument('search_term')
 @click.pass_context
 def show(ctx, search_term):
@@ -72,7 +74,7 @@ def show(ctx, search_term):
     click.echo(pybibs.write_string({entry['key']: entry}))
  
  
-@cli.command()
+@cli.command(short_help='Add a new entry.')
 @PDF_OPTION
 @click.pass_context
 def add(ctx, pdf):
@@ -87,9 +89,9 @@ def add(ctx, pdf):
     pybibs.write_file(data, ctx.obj['database'])
 
 
-@cli.command()
+@cli.command(short_help='Remove an entry or a field.')
 @click.argument('search_term')
-@click.option('--field', help='Field to remove')
+@click.option('--field', help='Field to remove.')
 @click.pass_context
 def remove(ctx, search_term, field):
     data = ctx.obj['data']
@@ -107,12 +109,12 @@ def remove(ctx, search_term, field):
     pybibs.write_file(data, ctx.obj['database'])
 
 
-@cli.command()
+@cli.command(short_help='Edit an entry.')
 @click.argument('search_term')
-@click.option('--type', help='Set the type')
-@click.option('--key', help='Set the key')
+@click.option('--type', help='Set the type.')
+@click.option('--key', help='Set the key.')
 @PDF_OPTION
-@click.option('--field', help='Field to edit')
+@click.option('--field', help='Field to edit.')
 @click.pass_context
 def edit(ctx, search_term, key, field, pdf, **kwargs):
     type_ = kwargs.pop('type')
