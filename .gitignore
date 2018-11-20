@@ -1,6 +1,3 @@
-# IBM Watson credentials
-credentials.json
-
 # general things to ignore
 build/
 dist/
