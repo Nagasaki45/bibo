@@ -16,13 +16,13 @@ def get(data, search_term):
     try:
         entry = next(search_results)
     except StopIteration:
-        raise QueryException('No results found')
+        raise QueryException('No entries found')
 
     try:
         next(search_results)
     except StopIteration:
         pass
     else:
-        raise QueryException('Multiple results found')
+        raise QueryException('Multiple entries found')
 
     return entry
