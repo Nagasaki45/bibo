@@ -88,7 +88,9 @@ def add(ctx, pdf):
 def remove(ctx, search_term, field):
     data = ctx.obj['data']
 
-    for entry in query.search(data, search_term):
+    entries = [e for e in query.search(data, search_term)]
+
+    for entry in entries:
         if field is None:
             remove_entry(data, entry)
         else:
