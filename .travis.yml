@@ -1,21 +1,23 @@
 language: python
-
 python:
-  - '3.6'
-
+- '3.6'
+deploy:
+  provider: pypi
+  user: nagasaki45
+  password:
+    secure: OI+eRNX7ljf9o+w1eGvom+oN7qEtKl09vGZUGDldoPZIZ+4xoovzucB+U1d87BMp/Eu0u35pfqmlkuaUtRMEnZqrHjdI3q7toCUj0fE4HH1Xd3Lpj5t+AmJsI74dIBFa4shbwgFAwHQO8uLW1FIQyek4VqbxMdFpxPGlmdSn1aNKr9FN1ZgBD0N380mGlLobDyTwQwtHXuZcSxmG3d5V9v0MKgzKTUVGNm3DAH1zHTNElbYALO6JMrRpEecOlBp91uVFOstDNW2OxwrLCEBJlplF5TjpE211j88iIOrAFE4T1PRXRPA/40Xw8xE85gAsi1cJq5ONUBNaqIrYGTwS1pUP8pbwezwFUFgRXfoTJOBOpFzwcRHhmfCWVtO9R/PWgq2kcqgXSwqJzff05WW/vNy1PdL2bOjSTP/6IeE2bjimd3vYjWF9ujoMoGZddAoeRYerE367h1gw62zSyt2lAut6uCAdj32QItYtfPZj7th1arpho9lK+SFsFE5Os+rmpUPUVocnv+lVcjYQSsuAxB64Z0aJX79XdDuVdWwhWj4xXFX+tzbNfB9lAiASmXkJGxk1OhnbPGxBmQsSCU6oIWchEHLO0m5t8OuLlgaNi7isLnUa4ebBFioLBrI/HYbraWK7IXAnsYkM4wSC2D0oyrfhLovceCDCN1BQ05uk/Qk=
+  on:
+    branch: master
 addons:
   apt:
     packages:
     - xclip
-
 install:
-  - pip install pipenv
-  - pipenv install --dev
-
+- pip install pipenv
+- pipenv install --dev
 before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3  # give xvfb some time to start
-
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- sleep 3
 script:
-  - pipenv run pytest
+- pipenv run pytest
