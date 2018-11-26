@@ -116,3 +116,47 @@ def test_remove_field(runner, database):
 
     with open(database) as f:
         assert 'hobbit.pdf' not in f.read()
+
+
+def test_edit_type(runner, database):
+    args = ['--database', database, 'edit', '--type', 'comics', 'asimov']
+    result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
+    assert result.output == ''
+
+    with open(database) as f:
+        assert '@comics{asimov' in f.read()
+
+
+def test_edit_type(runner, database):
+    args = ['--database', database, 'edit', '--key', 'asimov_rules', 'asimov']
+    result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
+    assert result.output == ''
+
+    with open(database) as f:
+        assert '@book{asimov_rules' in f.read()
+
+
+def test_edit_file(runner, database, example_pdf, tmpdir):
+    args = ['--database', database, 'edit', '--pdf', example_pdf, 'asimov']
+    result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
+    assert result.output == ''
+
+    with open(database) as f:
+        assert 'asimov1951foundation.pdf' in f.read()
+
+    expected_pdf = tmpdir / 'example.pdf'
+    assert os.path.isfile(expected_pdf)
+    assert filecmp.cmp(example_pdf, expected_pdf)
+
+
+def test_edit_field(runner, database):
+    args = ['--database', database, 'edit', '--field', 'title', 'asimov']
+    with mock.patch('click.edit') as edit_mock:
+        edit_mock.return_value = 'THE HOBBIT!'
+        result = runner.invoke(bibo.cli, args)
+
+    with open(database) as f:
+        assert 'title = {THE HOBBIT!}' in f.read()
