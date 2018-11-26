@@ -99,6 +99,7 @@ def test_remove(runner, database):
     with open(database) as f:
         assert 'asimov' not in f.read()
 
+
 def test_remove_entry_with_field(runner, database, tmpdir):
     with mock.patch('os.remove') as remove_mock:
         args = ['--database', database, 'remove', 'tolkien']
@@ -106,7 +107,8 @@ def test_remove_entry_with_field(runner, database, tmpdir):
     remove_mock.assert_called_once_with(tmpdir / 'hobbit.pdf')
     assert result.exit_code == 0
 
-def test_remove_field(runner, database, tmpdir):
+
+def test_remove_field(runner, database):
     args = ['--database', database, 'remove', '--field', 'file', 'tolkien']
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
