@@ -17,7 +17,6 @@ import pyperclip
 
 from . import query
 
-FILE_FIELD = re.compile('^:(?P<filepath>.*):[A-Z]+$')
 PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
                          dir_okay=False)
 PDF_OPTION = click.option(
@@ -64,8 +63,7 @@ def open(ctx, search_term):
         click.echo('No file is associated with this entry')
         sys.exit(1)
 
-    pdfpath = file_field_to_filepath(entry['file'])
-    open_file(pdfpath)
+    open_file(entry['file'])
 
 
 @cli.command(short_help='Add a new entry.')
@@ -188,14 +186,9 @@ def default_destination_path(data):
     for entry in data.values():
         if not 'file' in entry:
             continue
-        _, full_path, _ = entry['file'].split(':')
-        path = os.path.dirname(full_path)
+        path = os.path.dirname(entry['file'])
         counter[path] += 1
     return sorted(counter, reverse=True)[0]
-
-
-def file_field_to_filepath(file_field):
-    return re.match(FILE_FIELD, file_field).group('filepath')
 
 
 def remove_entry(data, entry):
@@ -205,7 +198,7 @@ def remove_entry(data, entry):
     file_field = entry.get('file')
     if file_field:
         try:
-            os.remove(file_field_to_filepath(file_field))
+            os.remove(file_field)
         except FileNotFoundError:
             click.echo('This entry\'s file was missing')
 
