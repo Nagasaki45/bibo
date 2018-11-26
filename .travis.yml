@@ -20,4 +20,6 @@ before_script:
 - sh -e /etc/init.d/xvfb start
 - sleep 3
 script:
-- pipenv run pytest
+- pipenv run coverage run -m pytest
+after_success:
+- codecov
