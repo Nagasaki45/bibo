@@ -73,6 +73,7 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         'click',
+        'click-plugins',
         'pybibs',
         'pyperclip',
     ],

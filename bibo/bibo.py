@@ -6,12 +6,14 @@ Inspired by beets.
 import collections
 import datetime
 import os
+import pkg_resources
 import re
 import shutil
 import subprocess
 import sys
 
 import click
+import click_plugins
 import pybibs
 import pyperclip
 
@@ -26,6 +28,7 @@ PDF_OPTION = click.option(
 )
 
 
+@click_plugins.with_plugins(pkg_resources.iter_entry_points('bibo.plugins'))
 @click.group(help=__doc__)
 @click.option('--database', envvar='BIBO_DATABASE', help='A .bib file.',
               required=True, type=PATH_OPTION)
@@ -99,22 +102,6 @@ def remove(ctx, search_term, field):
                 del entry['fields'][field]
             else:
                 click.echo('No such field')
-
-    pybibs.write_file(data, ctx.obj['database'])
-
-
-@cli.command('mark-read', short_help='Mark an entry as read.')
-@click.argument('search_term')
-@click.pass_context
-def mark_read(ctx, search_term):
-    data = ctx.obj['data']
-    try:
-        entry = query.get(data, search_term)
-    except query.QueryException as e:
-        click.echo(str(e))
-        sys.exit(1)
-
-    entry['readdate'] = str(datetime.date.today())
 
     pybibs.write_file(data, ctx.obj['database'])
 

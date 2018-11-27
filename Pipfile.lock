@@ -27,6 +27,13 @@
             ],
             "version": "==7.0"
         },
+        "click-plugins": {
+            "hashes": [
+                "sha256:b1ee1ccc9421c73007fe290680d97984eb6eaf5f4512b7620c6aa46031d6cb6b",
+                "sha256:dfed74b5063546a137de99baaaf742b4de4337ad2b3e1df5ec7c8a256adc0847"
+            ],
+            "version": "==1.0.4"
+        },
         "pybibs": {
             "hashes": [
                 "sha256:415dacf8dc1bfcf9ed9d2d78f283c8906e048ec3115c2cea2d5977a7050c559c",
