@@ -29,10 +29,10 @@
         },
         "pybibs": {
             "hashes": [
-                "sha256:1d935da133513425d824a5b647a648ba1f4659eac8cb95486e44f943c3afd875",
-                "sha256:5f31b137b65a115ab2ab1275b2bec5c33a24611986e40f41f6c82faa4343ffc7"
+                "sha256:415dacf8dc1bfcf9ed9d2d78f283c8906e048ec3115c2cea2d5977a7050c559c",
+                "sha256:cb20d78287ebc769a52d52f462f05d6d486dc0f97ae8926d477382fbd615ce69"
             ],
-            "version": "==0.0.2"
+            "version": "==0.0.3"
         },
         "pyperclip": {
             "hashes": [
