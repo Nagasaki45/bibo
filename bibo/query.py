@@ -1,12 +1,21 @@
+import itertools
+
+
 class QueryException(Exception):
     pass
 
 
 def search(data, search_term):
-    for key, fields in data.items():
-        for field in fields.values():
-            if search_term.lower() in field.lower():
-                yield fields
+    for entry in data:
+
+        searchables = itertools.chain(
+            entry['fields'].values(),
+            (entry[x] for x in ['key', 'type']),
+        )
+
+        for searchable in searchables:
+            if search_term.lower() in searchable.lower():
+                yield entry
                 break
 
 

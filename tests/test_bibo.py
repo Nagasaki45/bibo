@@ -128,7 +128,7 @@ def test_edit_type(runner, database):
         assert '@comics{asimov' in f.read()
 
 
-def test_edit_type(runner, database):
+def test_edit_key(runner, database):
     args = ['--database', database, 'edit', '--key', 'asimov_rules', 'asimov']
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0

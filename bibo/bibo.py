@@ -43,7 +43,7 @@ def cli(ctx, database):
 def list(ctx, search_term, raw):
     for entry in query.search(ctx.obj['data'], search_term):
         if raw:
-            txt = pybibs.write_string({entry['key']: entry})
+            txt = pybibs.write_string([entry])
         else:
             txt = format_entry(entry)
         click.echo(txt)
@@ -59,11 +59,12 @@ def open(ctx, search_term):
         click.echo(str(e))
         sys.exit(1)
 
-    if not 'file' in entry:
+    file_field = entry['fields'].get('file')
+    if not file_field:
         click.echo('No file is associated with this entry')
         sys.exit(1)
 
-    open_file(entry['file'])
+    open_file(file_field)
 
 
 @cli.command(short_help='Add a new entry.')
@@ -73,7 +74,7 @@ def add(ctx, pdf):
     data = ctx.obj['data']
     bib = click.edit(text=pyperclip.paste())
     entry = pybibs.read_entry_string(bib)
-    data[entry['key']] = entry
+    data.append(entry)
 
     if pdf:
         set_pdf(data, entry, pdf)
@@ -94,8 +95,8 @@ def remove(ctx, search_term, field):
         if field is None:
             remove_entry(data, entry)
         else:
-            if field in entry:
-                del entry[field]
+            if field in entry['fields']:
+                del entry['fields'][field]
             else:
                 click.echo('No such field')
 
@@ -139,21 +140,21 @@ def edit(ctx, search_term, key, field, pdf, **kwargs):
         entry['type'] = type_
     if key:
         entry['key'] = key
-        data[key] = entry
     if pdf:
         set_pdf(data, entry, pdf)
     if field:
-        current_value = entry.get(field, '')
+        current_value = entry['fields'].get(field, '')
         updated_value = click.edit(text=current_value).strip()
-        entry[field] = updated_value
+        entry['fields'][field] = updated_value
 
     pybibs.write_file(data, ctx.obj['database'])
 
 
 # Internals
 
-def format_entry(fields):
-    header = [click.style(fields['key'], fg='green')]
+def format_entry(entry):
+    header = [click.style(entry['key'], fg='green')]
+    fields = entry['fields']
     if fields.get('tags'):
         header.append(click.style(fields['tags'], fg='cyan'))
     if fields.get('file'):
@@ -185,10 +186,11 @@ def default_destination_path(data):
     vote.
     """
     counter = collections.Counter()
-    for entry in data.values():
-        if not 'file' in entry:
+    for entry in data:
+        file_field = entry['fields'].get('file')
+        if not file_field:
             continue
-        path = os.path.dirname(entry['file'])
+        path = os.path.dirname(file_field)
         counter[path] += 1
     return sorted(counter, reverse=True)[0]
 
@@ -197,20 +199,20 @@ def remove_entry(data, entry):
     '''
     Remove an entry in place.
     '''
-    file_field = entry.get('file')
+    file_field = entry['fields'].get('file')
     if file_field:
         try:
             os.remove(file_field)
         except FileNotFoundError:
             click.echo('This entry\'s file was missing')
 
-    del data[entry['key']]
+    data.remove(entry)
 
 
 def set_pdf(data, entry, pdf):
     destination_path = default_destination_path(data)
     destination = os.path.join(destination_path, entry['key'] + '.pdf')
-    entry['file'] = f':{destination}:PDF'
+    entry['fields']['file'] = f':{destination}:PDF'
     shutil.copy(pdf, destination)
 
 
