@@ -21,6 +21,12 @@ def test_search_specific_field(data):
     assert results[0]['fields']['title'] == 'The Hobbit'
 
 
+def test_search_multiple_terms_are_anded(data):
+    results = list(query.search(data, ['tolkien', 'type:book']))
+    assert len(results) == 1
+    assert results[0]['fields']['title'] == 'The Hobbit'
+
+
 def test_search_invalid_search_term(data):
     with pytest.raises(Exception) as e:
         list(query.search(data, 'a:b:c'))

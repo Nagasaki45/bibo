@@ -6,9 +6,19 @@ import click
 def search(data, search_terms):
     if isinstance(search_terms, str):
         search_terms = [search_terms]
-    for search_term in search_terms:
-        data = (e for e in data if _is_matching(e, search_term))
-    return data
+    search_terms = iter(search_terms)
+    return _recursive_search(data, search_terms)
+
+
+def _recursive_search(data, search_terms):
+    try:
+        search_term = next(search_terms)
+        return search(
+            (e for e in data if _is_matching(e, search_term)),
+            search_terms,
+        )
+    except StopIteration:
+        return data
 
 
 def _is_matching(entry, search_term):
