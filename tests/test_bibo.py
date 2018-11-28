@@ -95,7 +95,7 @@ def test_add(runner, database):
 def test_add_with_file(runner, database, example_pdf, tmpdir):
     with mock.patch('click.edit') as edit_mock:
         edit_mock.return_value = TO_ADD
-        args = ['--database', database, 'add', '--pdf', example_pdf]
+        args = ['--database', database, 'add', '--file', example_pdf]
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''
@@ -156,7 +156,7 @@ def test_edit_key(runner, database):
 
 
 def test_edit_file(runner, database, example_pdf, tmpdir):
-    args = ['--database', database, 'edit', '--pdf', example_pdf, 'asimov']
+    args = ['--database', database, 'edit', '--file', example_pdf, 'asimov']
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''

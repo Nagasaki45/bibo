@@ -21,9 +21,9 @@ from . import query
 
 PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
                          dir_okay=False)
-PDF_OPTION = click.option(
-    '--pdf',
-    help='PDF to link to this entry.',
+FILE_OPTION = click.option(
+    '--file',
+    help='File to link to this entry.',
     type=click.Path(exists=True, readable=True, dir_okay=False),
 )
 SEARCH_TERMS_OPTION = click.argument('search_terms', nargs=-1)
@@ -53,7 +53,7 @@ def list(ctx, search_terms, raw):
         click.echo(txt)
 
 
-@cli.command(short_help='Open the PDF linked to an entry.')
+@cli.command(short_help='Open the file linked to an entry.')
 @SEARCH_TERMS_OPTION
 @click.pass_context
 def open(ctx, search_terms):
@@ -68,16 +68,17 @@ def open(ctx, search_terms):
 
 
 @cli.command(short_help='Add a new entry.')
-@PDF_OPTION
+@FILE_OPTION
 @click.pass_context
-def add(ctx, pdf):
+def add(ctx, **kwargs):
     data = ctx.obj['data']
+    file_ = kwargs.pop('file')
     bib = click.edit(text=pyperclip.paste())
     entry = pybibs.read_entry_string(bib)
     data.append(entry)
 
-    if pdf:
-        set_pdf(data, entry, pdf)
+    if file_:
+        set_file(data, entry, file_)
 
     pybibs.write_file(data, ctx.obj['database'])
 
@@ -107,11 +108,12 @@ def remove(ctx, search_terms, field):
 @SEARCH_TERMS_OPTION
 @click.option('--type', help='Set the type.')
 @click.option('--key', help='Set the key.')
-@PDF_OPTION
+@FILE_OPTION
 @click.option('--field', help='Field to edit.')
 @click.pass_context
-def edit(ctx, search_terms, key, field, pdf, **kwargs):
+def edit(ctx, search_terms, key, field, **kwargs):
     type_ = kwargs.pop('type')
+    file_ = kwargs.pop('file')
 
     data = ctx.obj['data']
     entry = query.get(data, search_terms)
@@ -120,8 +122,8 @@ def edit(ctx, search_terms, key, field, pdf, **kwargs):
         entry['type'] = type_
     if key:
         entry['key'] = key
-    if pdf:
-        set_pdf(data, entry, pdf)
+    if file_:
+        set_file(data, entry, file_)
     if field:
         current_value = entry['fields'].get(field, '')
         updated_value = click.edit(text=current_value).strip()
@@ -189,11 +191,12 @@ def remove_entry(data, entry):
     data.remove(entry)
 
 
-def set_pdf(data, entry, pdf):
+def set_file(data, entry, file_):
     destination_path = default_destination_path(data)
-    destination = os.path.join(destination_path, entry['key'] + '.pdf')
-    entry['fields']['file'] = f':{destination}:PDF'
-    shutil.copy(pdf, destination)
+    _, file_extension = os.path.splitext(file_)
+    destination = os.path.join(destination_path, entry['key'] + file_extension)
+    entry['fields']['file'] = destination
+    shutil.copy(file_, destination)
 
 
 if __name__ == '__main__':
