@@ -9,18 +9,37 @@ import click
 
 
 def format_entry(entry):
-    header = [click.style(entry['key'], fg='green')]
+    header_line = header(entry)
+    citation_line = citation(entry)
+    if citation_line:
+        return '\n'.join([header_line, citation_line])
+    else:
+        return header_line
+
+
+def header(entry):
+    parts = [click.style(entry['key'], fg='green')]
     fields = entry['fields']
     if fields.get('tags'):
-        header.append(click.style(fields['tags'], fg='cyan'))
+        parts.append(click.style(fields['tags'], fg='cyan'))
     if fields.get('file'):
-        header.append('📁')
+        parts.append('📁')
     if fields.get('url'):
-        header.append('🔗')
-    return '\n'.join([
-        ' '.join(header),
-        '''{author} ({year}). {title}'''.format_map(fields)
-    ])
+        parts.append('🔗')
+    return ' '.join(parts)
+
+
+def citation(entry):
+    fields = entry['fields']
+    if 'author' in fields and 'year' in fields and 'title' in fields:
+        return '{author} ({year}). {title}'.format_map(fields)
+    if 'author' in fields and 'year' in fields:
+        return '{author} ({year})'.format_map(fields)
+    if 'author' in fields and 'title' in fields:
+        return '{author}. {title}'.format_map(fields)
+    if 'title' in fields and 'year' in fields:
+        return '{title} ({year})'.format_map(fields)
+    return None
 
 
 def open_file(filepath):
