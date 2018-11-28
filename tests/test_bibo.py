@@ -56,6 +56,13 @@ def test_list_with_search_by_field(runner, database):
     assert 'The Lord of the Rings' in result.output
 
 
+def test_list_with_no_arguments_to_get_everything(runner, database, data):
+    args = ['--database', database, 'list']
+    result = runner.invoke(bibo.cli, args)
+    for entry in data:
+        assert entry['key'] in result.output
+
+
 def test_open(runner, database):
     with mock.patch('bibo.internals.open_file') as open_file_mock:
         args = ['--database', database, 'open', 'tolkien1937']
