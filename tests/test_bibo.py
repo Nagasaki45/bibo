@@ -57,7 +57,7 @@ def test_list_with_search_by_field(runner, database):
 
 
 def test_open(runner, database):
-    with mock.patch('bibo.bibo.open_file') as open_file_mock:
+    with mock.patch('bibo.internals.open_file') as open_file_mock:
         args = ['--database', database, 'open', 'tolkien1937']
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
@@ -65,14 +65,14 @@ def test_open(runner, database):
 
 
 def test_open_no_file_field(runner, database):
-    with mock.patch('bibo.bibo.open_file') as open_file_mock:
+    with mock.patch('bibo.internals.open_file') as open_file_mock:
         result = runner.invoke(bibo.cli, ['--database', database, 'open', 'asimov'])
     assert result.exit_code == 1
     assert 'No file' in result.output
 
 
 def test_open_no_entry(runner, database):
-    with mock.patch('bibo.bibo.open_file') as open_file_mock:
+    with mock.patch('bibo.internals.open_file') as open_file_mock:
         result = runner.invoke(bibo.cli, ['--database', database, 'open', 'agnon'])
     assert result.exit_code == 1
     assert 'No entries' in result.output

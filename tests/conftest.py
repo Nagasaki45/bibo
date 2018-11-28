@@ -29,5 +29,5 @@ def runner():
 
 
 @pytest.fixture()
-def data():
-    return pybibs.read_file('tests/test.bib')
+def data(database):
+    return pybibs.read_file(database)

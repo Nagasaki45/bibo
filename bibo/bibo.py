@@ -3,13 +3,7 @@ Command line reference manager with a single source of truth: the .bib file.
 Inspired by beets.
 """
 
-import collections
-import datetime
-import os
 import pkg_resources
-import re
-import shutil
-import subprocess
 import sys
 
 import click
@@ -17,6 +11,7 @@ import click_plugins
 import pybibs
 import pyperclip
 
+from . import internals
 from . import query
 
 PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
@@ -49,7 +44,7 @@ def list(ctx, search_terms, raw):
         if raw:
             txt = pybibs.write_string([entry])
         else:
-            txt = format_entry(entry)
+            txt = internals.format_entry(entry)
         click.echo(txt)
 
 
@@ -64,7 +59,7 @@ def open(ctx, search_terms):
         click.echo('No file is associated with this entry')
         sys.exit(1)
 
-    open_file(file_field)
+    internals.open_file(file_field)
 
 
 @cli.command(short_help='Add a new entry.')
@@ -78,7 +73,7 @@ def add(ctx, **kwargs):
     data.append(entry)
 
     if file_:
-        set_file(data, entry, file_)
+        internals.set_file(data, entry, file_)
 
     pybibs.write_file(data, ctx.obj['database'])
 
@@ -94,7 +89,7 @@ def remove(ctx, search_terms, field):
 
     for entry in entries:
         if field is None:
-            remove_entry(data, entry)
+            internals.remove_entry(data, entry)
         else:
             if field in entry['fields']:
                 del entry['fields'][field]
@@ -123,80 +118,13 @@ def edit(ctx, search_terms, key, field, **kwargs):
     if key:
         entry['key'] = key
     if file_:
-        set_file(data, entry, file_)
+        internals.set_file(data, entry, file_)
     if field:
         current_value = entry['fields'].get(field, '')
         updated_value = click.edit(text=current_value).strip()
         entry['fields'][field] = updated_value
 
     pybibs.write_file(data, ctx.obj['database'])
-
-
-# Internals
-
-def format_entry(entry):
-    header = [click.style(entry['key'], fg='green')]
-    fields = entry['fields']
-    if fields.get('tags'):
-        header.append(click.style(fields['tags'], fg='cyan'))
-    if fields.get('file'):
-        header.append('📁')
-    if fields.get('url'):
-        header.append('🔗')
-    return '\n'.join([
-        ' '.join(header),
-        '''{author} ({year}). {title}'''.format_map(fields)
-    ])
-
-
-def open_file(filepath):
-    """
-    Open file with the default system app.
-    Copied from https://stackoverflow.com/a/435669/1224456
-    """
-    if sys.platform.startswith('darwin'):
-        subprocess.Popen(('open', filepath))
-    elif os.name == 'nt':
-        os.startfile(filepath)
-    elif os.name == 'posix':
-        subprocess.Popen(('xdg-open', filepath))
-
-
-def default_destination_path(data):
-    """
-    A heuristic to get the folder with all other files from bib, using majority
-    vote.
-    """
-    counter = collections.Counter()
-    for entry in data:
-        file_field = entry['fields'].get('file')
-        if not file_field:
-            continue
-        path = os.path.dirname(file_field)
-        counter[path] += 1
-    return sorted(counter, reverse=True)[0]
-
-
-def remove_entry(data, entry):
-    '''
-    Remove an entry in place.
-    '''
-    file_field = entry['fields'].get('file')
-    if file_field:
-        try:
-            os.remove(file_field)
-        except FileNotFoundError:
-            click.echo('This entry\'s file was missing')
-
-    data.remove(entry)
-
-
-def set_file(data, entry, file_):
-    destination_path = default_destination_path(data)
-    _, file_extension = os.path.splitext(file_)
-    destination = os.path.join(destination_path, entry['key'] + file_extension)
-    entry['fields']['file'] = destination
-    shutil.copy(file_, destination)
 
 
 if __name__ == '__main__':
