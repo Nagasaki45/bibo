@@ -26,6 +26,7 @@ PDF_OPTION = click.option(
     help='PDF to link to this entry.',
     type=click.Path(exists=True, readable=True, dir_okay=False),
 )
+SEARCH_TERMS_OPTION = click.argument('search_terms', nargs=-1)
 
 
 @click_plugins.with_plugins(pkg_resources.iter_entry_points('bibo.plugins'))
@@ -41,10 +42,10 @@ def cli(ctx, database):
 
 @cli.command(short_help='List entries.')
 @click.option('--raw', is_flag=True, help='Format as raw .bib entries')
-@click.argument('search_term')
+@SEARCH_TERMS_OPTION
 @click.pass_context
-def list(ctx, search_term, raw):
-    for entry in query.search(ctx.obj['data'], search_term):
+def list(ctx, search_terms, raw):
+    for entry in query.search(ctx.obj['data'], search_terms):
         if raw:
             txt = pybibs.write_string([entry])
         else:
@@ -53,10 +54,10 @@ def list(ctx, search_term, raw):
 
 
 @cli.command(short_help='Open the PDF linked to an entry.')
-@click.argument('search_term')
+@SEARCH_TERMS_OPTION
 @click.pass_context
-def open(ctx, search_term):
-    entry = query.get(ctx.obj['data'], search_term)
+def open(ctx, search_terms):
+    entry = query.get(ctx.obj['data'], search_terms)
 
     file_field = entry['fields'].get('file')
     if not file_field:
@@ -82,13 +83,13 @@ def add(ctx, pdf):
 
 
 @cli.command(short_help='Remove an entry or a field.')
-@click.argument('search_term')
+@SEARCH_TERMS_OPTION
 @click.option('--field', help='Field to remove.')
 @click.pass_context
-def remove(ctx, search_term, field):
+def remove(ctx, search_terms, field):
     data = ctx.obj['data']
 
-    entries = [e for e in query.search(data, search_term)]
+    entries = [e for e in query.search(data, search_terms)]
 
     for entry in entries:
         if field is None:
@@ -103,17 +104,17 @@ def remove(ctx, search_term, field):
 
 
 @cli.command(short_help='Edit an entry.')
-@click.argument('search_term')
+@SEARCH_TERMS_OPTION
 @click.option('--type', help='Set the type.')
 @click.option('--key', help='Set the key.')
 @PDF_OPTION
 @click.option('--field', help='Field to edit.')
 @click.pass_context
-def edit(ctx, search_term, key, field, pdf, **kwargs):
+def edit(ctx, search_terms, key, field, pdf, **kwargs):
     type_ = kwargs.pop('type')
 
     data = ctx.obj['data']
-    entry = query.get(data, search_term)
+    entry = query.get(data, search_terms)
 
     if type_:
         entry['type'] = type_

@@ -40,6 +40,22 @@ def test_list_multiple_matches(runner, database):
     assert 'Foundation' in result.output
 
 
+def test_list_with_multiple_search_terms(runner, database):
+    args = ['--database', database, 'list', 'book', 'year:1937']
+    result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
+    assert 'The Hobbit' in result.output
+    assert 'The Lord of the Rings' not in result.output
+
+
+def test_list_with_search_by_field(runner, database):
+    args = ['--database', database, 'list', 'type:trilogy']
+    result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
+    assert 'The Hobbit' not in result.output
+    assert 'The Lord of the Rings' in result.output
+
+
 def test_open(runner, database):
     with mock.patch('bibo.bibo.open_file') as open_file_mock:
         args = ['--database', database, 'open', 'tolkien1937']
