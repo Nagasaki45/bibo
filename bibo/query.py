@@ -1,8 +1,6 @@
 import itertools
 
-
-class QueryException(Exception):
-    pass
+import click
 
 
 def search(data, search_term):
@@ -25,13 +23,13 @@ def get(data, search_term):
     try:
         entry = next(search_results)
     except StopIteration:
-        raise QueryException('No entries found')
+        raise click.ClickException('No entries found')
 
     try:
         next(search_results)
     except StopIteration:
         pass
     else:
-        raise QueryException('Multiple entries found')
+        raise click.ClickException('Multiple entries found')
 
     return entry

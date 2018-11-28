@@ -56,11 +56,7 @@ def list(ctx, search_term, raw):
 @click.argument('search_term')
 @click.pass_context
 def open(ctx, search_term):
-    try:
-        entry = query.get(ctx.obj['data'], search_term)
-    except query.QueryException as e:
-        click.echo(str(e))
-        sys.exit(1)
+    entry = query.get(ctx.obj['data'], search_term)
 
     file_field = entry['fields'].get('file')
     if not file_field:
@@ -117,11 +113,7 @@ def edit(ctx, search_term, key, field, pdf, **kwargs):
     type_ = kwargs.pop('type')
 
     data = ctx.obj['data']
-    try:
-        entry = query.get(data, search_term)
-    except query.QueryException as e:
-        click.echo(str(e))
-        sys.exit(1)
+    entry = query.get(data, search_term)
 
     if type_:
         entry['type'] = type_
