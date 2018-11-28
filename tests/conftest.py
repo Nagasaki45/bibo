@@ -1,6 +1,7 @@
 import shutil
 
 import click.testing 
+import pybibs
 import pytest
 
 
@@ -25,3 +26,8 @@ def example_pdf(tmpdir):
 @pytest.fixture()
 def runner():
     return click.testing.CliRunner()
+
+
+@pytest.fixture()
+def data():
+    return pybibs.read_file('tests/test.bib')

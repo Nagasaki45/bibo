@@ -42,7 +42,8 @@ def test_list_multiple_matches(runner, database):
 
 def test_open(runner, database):
     with mock.patch('bibo.bibo.open_file') as open_file_mock:
-        result = runner.invoke(bibo.cli, ['--database', database, 'open', 'tolkien'])
+        args = ['--database', database, 'open', 'tolkien1937']
+        result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert open_file_mock.call_count == 1
 
@@ -109,7 +110,7 @@ def test_remove_entry_with_field(runner, database, tmpdir):
 
 
 def test_remove_field(runner, database):
-    args = ['--database', database, 'remove', '--field', 'file', 'tolkien']
+    args = ['--database', database, 'remove', '--field', 'file', 'tolkien1937']
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''
