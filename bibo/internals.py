@@ -50,7 +50,9 @@ def destination_heuristic(data):
         counter[path] += 1
 
     if not counter:  # No paths found
-        return None
+        raise click.ClickException(
+            'Path finding heuristics failed: no paths in the database'
+        )
 
     # Find the paths that appears most often
     sorted_paths = sorted(counter, reverse=True)
@@ -65,7 +67,10 @@ def destination_heuristic(data):
     except StopIteration:
         return candidate
     else:
-        return None
+        raise click.ClickException(
+            'Path finding heuristics failed: '
+            'there are multiple equally valid paths in the database'
+        )
 
 
 def remove_entry(data, entry):
