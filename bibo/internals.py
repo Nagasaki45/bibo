@@ -106,9 +106,10 @@ def remove_entry(data, entry):
     data.remove(entry)
 
 
-def set_file(data, entry, file_):
-    destination_path = destination_heuristic(data)
+def set_file(data, entry, file_, destination=None):
+    if not destination:
+        destination = destination_heuristic(data)
     _, file_extension = os.path.splitext(file_)
-    destination = os.path.join(destination_path, entry['key'] + file_extension)
-    entry['fields']['file'] = destination
-    shutil.copy(file_, destination)
+    path = os.path.join(destination, entry['key'] + file_extension)
+    entry['fields']['file'] = path
+    shutil.copy(file_, path)

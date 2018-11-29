@@ -21,6 +21,11 @@ FILE_OPTION = click.option(
     help='File to link to this entry.',
     type=click.Path(exists=True, readable=True, dir_okay=False),
 )
+DESTINATION_OPTION = click.option(
+    '--destination',
+    help='A folder to put the file in.',
+    type=click.Path(exists=True, readable=True, dir_okay=True, file_okay=False),
+)
 SEARCH_TERMS_OPTION = click.argument('search_terms', nargs=-1)
 
 
@@ -64,10 +69,13 @@ def open(ctx, search_terms):
 
 @cli.command(short_help='Add a new entry.')
 @FILE_OPTION
+@DESTINATION_OPTION
 @click.pass_context
-def add(ctx, **kwargs):
-    data = ctx.obj['data']
+def add(ctx, destination, **kwargs):
     file_ = kwargs.pop('file')
+    file_validation(file_, destination)
+
+    data = ctx.obj['data']
     bib = click.edit(text=pyperclip.paste())
     entry = pybibs.read_entry_string(bib)
     data.append(entry)
@@ -104,11 +112,13 @@ def remove(ctx, search_terms, field):
 @click.option('--type', help='Set the type.')
 @click.option('--key', help='Set the key.')
 @FILE_OPTION
+@DESTINATION_OPTION
 @click.option('--field', help='Field to edit.')
 @click.pass_context
-def edit(ctx, search_terms, key, field, **kwargs):
+def edit(ctx, search_terms, key, field, destination, **kwargs):
     type_ = kwargs.pop('type')
     file_ = kwargs.pop('file')
+    file_validation(file_, destination)
 
     data = ctx.obj['data']
     entry = query.get(data, search_terms)
@@ -126,6 +136,13 @@ def edit(ctx, search_terms, key, field, **kwargs):
 
     pybibs.write_file(data, ctx.obj['database'])
 
+
+def file_validation(file_, destination):
+    if destination and not file_:
+        raise click.BadOptionUsage(
+            'destination',
+            'Specifying destination without a file is meaningless.',
+        )
 
 if __name__ == '__main__':
     cli()
