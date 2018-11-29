@@ -14,8 +14,7 @@ import pyperclip
 from . import internals
 from . import query
 
-PATH_OPTION = click.Path(exists=True, writable=True, readable=True,
-                         dir_okay=False)
+PATH_OPTION = click.Path(writable=True, readable=True, dir_okay=False)
 FILE_OPTION = click.option(
     '--file',
     help='File to link to this entry.',
@@ -37,7 +36,12 @@ SEARCH_TERMS_OPTION = click.argument('search_terms', nargs=-1)
 def cli(ctx, database):
     ctx.ensure_object(dict)
     ctx.obj['database'] = database
-    ctx.obj['data'] = pybibs.read_file(database)
+
+    # Read the database. Create (in memory) if doesn't exist
+    try:
+        ctx.obj['data'] = pybibs.read_file(database)
+    except FileNotFoundError:
+        ctx.obj['data'] = []
 
 
 @cli.command(short_help='List entries.')

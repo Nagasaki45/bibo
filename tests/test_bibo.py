@@ -184,3 +184,15 @@ def test_edit_field(runner, database):
 
     with open(database) as f:
         assert 'title = {THE HOBBIT!}' in f.read()
+
+
+def test_add_to_empty_database(runner, tmpdir):
+    database = str(tmpdir / 'new.bib')
+    with mock.patch('click.edit') as edit_mock:
+        edit_mock.return_value = TO_ADD
+        args = ['--database', database, 'add']
+        result = runner.invoke(bibo.cli, args)
+    assert result.output == ''
+
+    with open(database) as f:
+        assert 'The emotional dog' in f.read()
