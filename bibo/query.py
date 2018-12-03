@@ -48,7 +48,7 @@ def _is_matching_specific_field(entry, search_field, search_value):
         return search_value in entry['type'].lower()
     for field, value in entry['fields'].items():
         if search_field == field.lower():
-            return search_value in value
+            return search_value in value.lower()
     return False
 
 

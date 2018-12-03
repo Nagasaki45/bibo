@@ -21,6 +21,13 @@ def test_search_specific_field(data):
     assert results[0]['fields']['title'] == 'The Hobbit'
 
 
+def test_search_specific_field_with_capital_letter(data):
+    '''Issue #27'''
+    results = list(query.search(data, ['author:asimov']))
+    assert len(results) == 1
+    assert results[0]['fields']['title'] == 'Foundation'
+
+
 def test_search_multiple_terms_are_anded(data):
     results = list(query.search(data, ['tolkien', 'type:book']))
     assert len(results) == 1
