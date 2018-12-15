@@ -106,7 +106,7 @@ def test_add_with_file(runner, database, example_pdf, tmpdir):
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''
-    expected_pdf = tmpdir / 'example.pdf'
+    expected_pdf = tmpdir / 'haidt2001emotional.pdf'
     assert os.path.isfile(expected_pdf)
     assert filecmp.cmp(example_pdf, expected_pdf)
 
