@@ -85,7 +85,7 @@ def add(ctx, destination, **kwargs):
     data.append(entry)
 
     if file_:
-        internals.set_file(data, entry, file_)
+        internals.set_file(data, entry, file_, destination)
 
     pybibs.write_file(data, ctx.obj['database'])
 
@@ -132,7 +132,7 @@ def edit(ctx, search_terms, key, field, destination, **kwargs):
     if key:
         entry['key'] = key
     if file_:
-        internals.set_file(data, entry, file_)
+        internals.set_file(data, entry, file_, destination)
     if field:
         current_value = entry['fields'].get(field, '')
         updated_value = click.edit(text=current_value).strip()

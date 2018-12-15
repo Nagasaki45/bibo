@@ -114,6 +114,18 @@ def test_add_with_file(runner, database, example_pdf, tmpdir):
     assert 'The emotional dog' in result.output
 
 
+def test_add_file_with_destination(runner, database, example_pdf, tmpdir):
+    destination = tmpdir / 'destination'
+    os.mkdir(destination)
+    with mock.patch('click.edit') as edit_mock:
+        edit_mock.return_value = TO_ADD
+        args = ['--database', database, 'add', '--file', example_pdf,
+                '--destination', str(destination)]
+        result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
+    assert os.path.isfile(destination / 'haidt2001emotional.pdf')
+
+
 def test_remove(runner, database):
     args = ['--database', database, 'remove', 'asimov']
     result = runner.invoke(bibo.cli, args)
