@@ -13,7 +13,7 @@ def search(data, search_terms):
 def _recursive_search(data, search_terms):
     try:
         search_term = next(search_terms)
-        return search(
+        return _recursive_search(
             (e for e in data if _is_matching(e, search_term)),
             search_terms,
         )
