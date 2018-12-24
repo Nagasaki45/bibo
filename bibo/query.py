@@ -55,7 +55,7 @@ def _is_matching_specific_field(entry, search_field, search_value):
 def _parse_search_term(search_term):
     parts = search_term.split(':')
     if len(parts) == 1:
-        return 'general', parts[0]
+        return 'general', parts[0].lower()
     if len(parts) == 2:
         return parts[0].lower(), parts[1].lower()
     raise click.ClickException('Invalid search term')

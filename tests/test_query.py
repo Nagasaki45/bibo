@@ -38,3 +38,10 @@ def test_search_invalid_search_term(data):
     with pytest.raises(Exception) as e:
         list(query.search(data, 'a:b:c'))
     assert 'Invalid search term' in str(e)
+
+
+def test_search_with_capitalized_search_term(data):
+    '''Issue #28'''
+    results = list(query.search(data, ['ASIMOV']))
+    assert len(results) == 1
+    assert results[0]['fields']['title'] == 'Foundation'
