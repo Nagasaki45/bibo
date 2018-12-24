@@ -30,7 +30,7 @@ def _bibtex(aux_filepath):
     assert p.returncode == 0
 
 
-bibitem_pattern = re.compile(r'^\\bibitem\{(?P<key>.*)\}\n')
+bibitem_pattern = re.compile(r'^\\bibitem(\[.*\])?\{(?P<key>.*)\}\n')
 
 
 def _parse_bbl(bbl_filepath):

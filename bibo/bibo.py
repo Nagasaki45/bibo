@@ -11,6 +11,7 @@ import click_plugins
 import pybibs
 import pyperclip
 
+from . import cite
 from . import internals
 from . import query
 
@@ -46,12 +47,26 @@ def cli(ctx, database):
 
 @cli.command('list', short_help='List entries.')
 @click.option('--raw', is_flag=True, help='Format as raw .bib entries')
+@click.option('--bibstyle', help='Citation format')
 @SEARCH_TERMS_OPTION
 @click.pass_context
-def list_(ctx, search_terms, raw):
-    for entry in query.search(ctx.obj['data'], search_terms):
+def list_(ctx, search_terms, raw, bibstyle):
+
+    if bibstyle:
+        entries = list(query.search(ctx.obj['data'], search_terms))
+        keys = [e['key'] for e in entries]
+        citations = cite.cite(keys, ctx.obj['database'], bibstyle)
+    else:
+        entries = query.search(ctx.obj['data'], search_terms)
+
+    for entry in entries:
         if raw:
             txt = pybibs.write_string([entry])
+        elif bibstyle:
+            txt = '\n'.join([
+                internals.header(entry),
+                citations[entry['key']],
+            ])
         else:
             txt = internals.format_entry(entry)
         click.echo(txt)
