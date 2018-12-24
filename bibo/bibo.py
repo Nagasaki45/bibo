@@ -44,11 +44,11 @@ def cli(ctx, database):
         ctx.obj['data'] = []
 
 
-@cli.command(short_help='List entries.')
+@cli.command('list', short_help='List entries.')
 @click.option('--raw', is_flag=True, help='Format as raw .bib entries')
 @SEARCH_TERMS_OPTION
 @click.pass_context
-def list(ctx, search_terms, raw):
+def list_(ctx, search_terms, raw):
     for entry in query.search(ctx.obj['data'], search_terms):
         if raw:
             txt = pybibs.write_string([entry])
@@ -57,10 +57,10 @@ def list(ctx, search_terms, raw):
         click.echo(txt)
 
 
-@cli.command(short_help='Open the file linked to an entry.')
+@cli.command('open', short_help='Open the file linked to an entry.')
 @SEARCH_TERMS_OPTION
 @click.pass_context
-def open(ctx, search_terms):
+def open_(ctx, search_terms):
     entry = query.get(ctx.obj['data'], search_terms)
 
     file_field = entry['fields'].get('file')
