@@ -40,7 +40,7 @@ def cli(ctx, database):
     # Read the database. Create (in memory) if doesn't exist
     try:
         ctx.obj['data'] = pybibs.read_file(database)
-    except FileNotFoundError:
+    except IOError:
         ctx.obj['data'] = []
 
 

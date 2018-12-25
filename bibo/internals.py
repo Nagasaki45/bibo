@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import collections
 import itertools
 import os
@@ -32,13 +34,13 @@ def header(entry):
 def citation(entry):
     fields = entry['fields']
     if 'author' in fields and 'year' in fields and 'title' in fields:
-        return '{author} ({year}). {title}'.format_map(fields)
+        return '{author} ({year}). {title}'.format(**fields)
     if 'author' in fields and 'year' in fields:
-        return '{author} ({year})'.format_map(fields)
+        return '{author} ({year})'.format(**fields)
     if 'author' in fields and 'title' in fields:
-        return '{author}. {title}'.format_map(fields)
+        return '{author}. {title}'.format(**fields)
     if 'title' in fields and 'year' in fields:
-        return '{title} ({year})'.format_map(fields)
+        return '{title} ({year})'.format(**fields)
     return None
 
 
@@ -100,7 +102,7 @@ def remove_entry(data, entry):
     if file_field:
         try:
             os.remove(file_field)
-        except FileNotFoundError:
+        except IOError:
             click.echo('This entry\'s file was missing')
 
     data.remove(entry)

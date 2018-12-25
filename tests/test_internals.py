@@ -30,6 +30,6 @@ def test_destination_heuristic_multiple_equaly_valid_paths(data):
 def test_set_file_with_destination(data, example_pdf, tmpdir):
     entry = data[0]
     destination = tmpdir / 'somewhere_else'
-    os.mkdir(destination)
-    internals.set_file(data, entry, example_pdf, destination)
-    assert os.path.exists(destination / entry['key'] + '.pdf')
+    os.mkdir(str(destination))
+    internals.set_file(data, entry, example_pdf, str(destination))
+    assert os.path.exists(str(destination / entry['key'] + '.pdf'))

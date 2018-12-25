@@ -10,7 +10,7 @@ def database(tmpdir):
     with open('tests/test.bib') as f:
         bib_content = f.read()
     bib_content = bib_content.replace('TMPDIR_PLACEHOLDER', str(tmpdir))
-    destination = tmpdir / 'test.bib'
+    destination = str(tmpdir / 'test.bib')
     with open(destination, 'w') as f:
         f.write(bib_content)
     return destination
@@ -19,8 +19,8 @@ def database(tmpdir):
 @pytest.fixture()
 def example_pdf(tmpdir):
     source = 'tests/example.pdf'
-    shutil.copy(source, tmpdir)
-    return tmpdir / 'example.pdf'
+    shutil.copy(source, str(tmpdir))
+    return str(tmpdir / 'example.pdf')
 
 
 @pytest.fixture()

@@ -83,6 +83,7 @@ setup(
             'pytest',
             'coverage',
             'codecov',
+            'mock;python_version<"3.3"',
         ],
     },
 

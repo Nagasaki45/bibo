@@ -1,6 +1,9 @@
 import filecmp
 import os
-from unittest import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 import click
 
@@ -106,7 +109,7 @@ def test_add_with_file(runner, database, example_pdf, tmpdir):
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''
-    expected_pdf = tmpdir / 'haidt2001emotional.pdf'
+    expected_pdf = str(tmpdir / 'haidt2001emotional.pdf')
     assert os.path.isfile(expected_pdf)
     assert filecmp.cmp(example_pdf, expected_pdf)
 
@@ -116,14 +119,14 @@ def test_add_with_file(runner, database, example_pdf, tmpdir):
 
 def test_add_file_with_destination(runner, database, example_pdf, tmpdir):
     destination = tmpdir / 'destination'
-    os.mkdir(destination)
+    os.mkdir(str(destination))
     with mock.patch('click.edit') as edit_mock:
         edit_mock.return_value = TO_ADD
         args = ['--database', database, 'add', '--file', example_pdf,
                 '--destination', str(destination)]
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
-    assert os.path.isfile(destination / 'haidt2001emotional.pdf')
+    assert os.path.isfile(str(destination / 'haidt2001emotional.pdf'))
 
 
 def test_remove(runner, database):
@@ -183,7 +186,7 @@ def test_edit_file(runner, database, example_pdf, tmpdir):
     with open(database) as f:
         assert 'asimov1951foundation.pdf' in f.read()
 
-    expected_pdf = tmpdir / 'example.pdf'
+    expected_pdf = str(tmpdir / 'example.pdf')
     assert os.path.isfile(expected_pdf)
     assert filecmp.cmp(example_pdf, expected_pdf)
 
@@ -204,6 +207,7 @@ def test_add_to_empty_database(runner, tmpdir):
         edit_mock.return_value = TO_ADD
         args = ['--database', database, 'add']
         result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
     assert result.output == ''
 
     with open(database) as f:
