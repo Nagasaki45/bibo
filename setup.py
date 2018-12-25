@@ -78,6 +78,14 @@ setup(
         'pyperclip',
     ],
 
+    extras_require={
+        'test': [
+            'pytest',
+            'coverage',
+            'codecov',
+        ],
+    },
+
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # `pip` to create the appropriate form of executable for the target

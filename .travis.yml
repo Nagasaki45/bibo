@@ -14,13 +14,12 @@ addons:
     packages:
     - xclip
 install:
-- pip install pipenv
-- pipenv install --dev
+- pip install .[test]
 before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
 - sleep 3
 script:
-- pipenv run coverage run -m pytest
+- coverage run -m pytest
 after_success:
 - codecov
