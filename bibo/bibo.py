@@ -52,27 +52,37 @@ def cli(ctx, database):
 @SEARCH_TERMS_OPTION
 @click.pass_context
 def list_(ctx, search_terms, raw, bibstyle, verbose):
+    entries = query.search(ctx.obj['data'], search_terms)
+    if raw:
+        _list_raw(entries)
+    else:
+        _list_citations(entries, ctx.obj['database'], bibstyle, verbose)
 
-    entries = list(query.search(ctx.obj['data'], search_terms))
+
+def _list_raw(entries):
+    for entry in entries:
+        click.echo(pybibs.write_string([entry]))
+
+
+def _list_citations(entries, database, bibstyle, verbose):
+    entries = list(entries)
     keys = [e['key'] for e in entries]
     exception = None
     try:
-        citations = cite.cite(keys, ctx.obj['database'], bibstyle, verbose)
+        citations = cite.cite(keys, database, bibstyle, verbose)
     except cite.BibtexException as e:
         exception = e
 
     for entry in entries:
-        if raw:
-            txt = pybibs.write_string([entry])
+        if exception is None:
+            citation_line = citations[entry['key']]
         else:
-            if exception is None:
-                citation_line = citations[entry['key']]
-            else:
-                citation_line = cite.fallback(entry)
-            txt = '\n'.join([
-                internals.header(entry),
-                citation_line,
-            ])
+            citation_line = cite.fallback(entry)
+
+        txt = '\n'.join([
+            internals.header(entry),
+            citation_line,
+        ])
         click.echo(txt)
 
     if exception is not None:
