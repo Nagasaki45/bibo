@@ -74,16 +74,11 @@ def _list_citations(entries, database, bibstyle, verbose):
         exception = e
 
     for entry in entries:
-        if exception is None:
-            citation_line = citations[entry['key']]
-        else:
-            citation_line = cite.fallback(entry)
-
-        txt = '\n'.join([
+        parts = [
             internals.header(entry),
-            citation_line,
-        ])
-        click.echo(txt)
+            cite.fallback(entry) if exception else citations[entry['key']],
+        ]
+        click.echo('\n'.join(parts))
 
     if exception is not None:
         click.secho(str(exception), fg='red')
