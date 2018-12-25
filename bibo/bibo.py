@@ -55,26 +55,28 @@ def list_(ctx, search_terms, raw, bibstyle, verbose):
 
     entries = list(query.search(ctx.obj['data'], search_terms))
     keys = [e['key'] for e in entries]
+    exception = None
     try:
         citations = cite.cite(keys, ctx.obj['database'], bibstyle, verbose)
-        use_fallback = False
     except cite.BibtexException as e:
-        click.secho(str(e), fg='red')
-        use_fallback = True
+        exception = e
 
     for entry in entries:
         if raw:
             txt = pybibs.write_string([entry])
         else:
-            if use_fallback:
-                citation_line = internals.fallback_cite(entry)
-            else:
+            if exception is None:
                 citation_line = citations[entry['key']]
+            else:
+                citation_line = cite.fallback(entry)
             txt = '\n'.join([
                 internals.header(entry),
                 citation_line,
             ])
         click.echo(txt)
+
+    if exception is not None:
+        click.secho(str(exception), fg='red')
 
 
 @cli.command('open', short_help='Open the file linked to an entry.')

@@ -18,6 +18,19 @@ def cite(keys, database, bibstyle='plain', verbose=False):
     return _parse_bbl(bbl_filepath)
 
 
+def fallback(entry):
+    fields = entry['fields']
+    if 'author' in fields and 'year' in fields and 'title' in fields:
+        return '{author} ({year}). {title}'.format(**fields)
+    if 'author' in fields and 'year' in fields:
+        return '{author} ({year})'.format(**fields)
+    if 'author' in fields and 'title' in fields:
+        return '{author}. {title}'.format(**fields)
+    if 'title' in fields and 'year' in fields:
+        return '{title} ({year})'.format(**fields)
+    return entry['type']
+
+
 def _write_aux_file(keys, database, bibstyle):
     auxfile = tempfile.NamedTemporaryFile('w', suffix='.aux', delete=False)
     with auxfile as f:

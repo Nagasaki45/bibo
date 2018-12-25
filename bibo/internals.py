@@ -22,19 +22,6 @@ def header(entry):
     return ' '.join(parts)
 
 
-def fallback_cite(entry):
-    fields = entry['fields']
-    if 'author' in fields and 'year' in fields and 'title' in fields:
-        return '{author} ({year}). {title}'.format(**fields)
-    if 'author' in fields and 'year' in fields:
-        return '{author} ({year})'.format(**fields)
-    if 'author' in fields and 'title' in fields:
-        return '{author}. {title}'.format(**fields)
-    if 'title' in fields and 'year' in fields:
-        return '{title} ({year})'.format(**fields)
-    return ''
-
-
 def open_file(filepath):
     """
     Open file with the default system app.
