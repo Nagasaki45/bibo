@@ -79,6 +79,9 @@ setup(
     ],
 
     extras_require={
+        'dev': [
+            'bumpversion',
+        ],
         'test': [
             'pytest',
             'coverage',
