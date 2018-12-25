@@ -10,15 +10,6 @@ import sys
 import click
 
 
-def format_entry(entry):
-    header_line = header(entry)
-    citation_line = citation(entry)
-    if citation_line:
-        return '\n'.join([header_line, citation_line])
-    else:
-        return header_line
-
-
 def header(entry):
     parts = [click.style(entry['key'], fg='green')]
     fields = entry['fields']
@@ -31,7 +22,7 @@ def header(entry):
     return ' '.join(parts)
 
 
-def citation(entry):
+def fallback_cite(entry):
     fields = entry['fields']
     if 'author' in fields and 'year' in fields and 'title' in fields:
         return '{author} ({year}). {title}'.format(**fields)
@@ -41,7 +32,7 @@ def citation(entry):
         return '{author}. {title}'.format(**fields)
     if 'title' in fields and 'year' in fields:
         return '{title} ({year})'.format(**fields)
-    return None
+    return ''
 
 
 def open_file(filepath):

@@ -47,28 +47,33 @@ def cli(ctx, database):
 
 @cli.command('list', short_help='List entries.')
 @click.option('--raw', is_flag=True, help='Format as raw .bib entries')
-@click.option('--bibstyle', help='Citation format')
+@click.option('--bibstyle', default='plain', help='Citation format')
+@click.option('--verbose', is_flag=True, help='Print verbose information')
 @SEARCH_TERMS_OPTION
 @click.pass_context
-def list_(ctx, search_terms, raw, bibstyle):
+def list_(ctx, search_terms, raw, bibstyle, verbose):
 
-    if bibstyle:
-        entries = list(query.search(ctx.obj['data'], search_terms))
-        keys = [e['key'] for e in entries]
-        citations = cite.cite(keys, ctx.obj['database'], bibstyle)
-    else:
-        entries = query.search(ctx.obj['data'], search_terms)
+    entries = list(query.search(ctx.obj['data'], search_terms))
+    keys = [e['key'] for e in entries]
+    try:
+        citations = cite.cite(keys, ctx.obj['database'], bibstyle, verbose)
+        use_fallback = False
+    except cite.BibtexException as e:
+        click.secho(str(e), fg='red')
+        use_fallback = True
 
     for entry in entries:
         if raw:
             txt = pybibs.write_string([entry])
-        elif bibstyle:
+        else:
+            if use_fallback:
+                citation_line = internals.fallback_cite(entry)
+            else:
+                citation_line = citations[entry['key']]
             txt = '\n'.join([
                 internals.header(entry),
-                citations[entry['key']],
+                citation_line,
             ])
-        else:
-            txt = internals.format_entry(entry)
         click.echo(txt)
 
 

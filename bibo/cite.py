@@ -1,12 +1,19 @@
 import os
 import re
 import subprocess
+import sys
 import tempfile
 
 
-def cite(keys, database, bibstyle='plain'):
+class BibtexException(Exception):
+    pass
+
+
+def cite(keys, database, bibstyle='plain', verbose=False):
+    if not keys:
+        return {}
     aux_filepath = _write_aux_file(keys, database, bibstyle)
-    _bibtex(aux_filepath)
+    _bibtex(aux_filepath, verbose)
     bbl_filepath = aux_filepath.replace('.aux', '.bbl')
     return _parse_bbl(bbl_filepath)
 
@@ -23,11 +30,25 @@ def _write_aux_file(keys, database, bibstyle):
     return auxfile.name
 
 
-def _bibtex(aux_filepath):
+def _bibtex(aux_filepath, verbose):
     cwd, aux_filename = os.path.split(aux_filepath)
-    p = subprocess.Popen(['bibtex', aux_filename], cwd=cwd)
+    stdout = sys.stdout if verbose else subprocess.PIPE
+    stderr = sys.stderr if verbose else subprocess.PIPE
+    try:
+        p = subprocess.Popen(['bibtex', aux_filename], cwd=cwd,
+                             stdout=stdout, stderr=stderr)
+    except FileNotFoundError:
+        raise BibtexException(
+            'bibtex is not available on your system. '
+            'Using a fallback citation method instead'
+        )
     p.wait()
-    assert p.returncode == 0
+    if p.returncode != 0:
+        raise BibtexException(
+            'Citation generation with bibtex failed. '
+            'Using a fallback citation method instead. '
+            'Use --verbose for more information'
+        )
 
 
 bibitem_pattern = re.compile(r'^\\bibitem(\[.*\])?\{(?P<key>.*)\}\n')

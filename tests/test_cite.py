@@ -21,3 +21,8 @@ def test_cite_complex2(database):
     results = cite.cite([key], database)
     expected = 'Tom Gurion, Patrick GT Healey, and Julian Hough. Real-time testing of non-verbal interaction: An experimental method and platform. In The 22nd workshop on the Semantics and Pragmatics of Dialogue, 2018.'
     assert results[key] == expected
+
+
+def test_cite_no_keys(database):
+    result = cite.cite([], database)
+    assert result == {}
