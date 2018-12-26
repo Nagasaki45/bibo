@@ -224,7 +224,7 @@ def test_list_missing_bibtex(popen_mock, runner, database):
 
 
 @mock.patch('subprocess.Popen')
-def test_list_missing_bibtex(popen_mock, runner, database):
+def test_list_failing_bibtex(popen_mock, runner, database):
     p = mock.Mock()
     p.wait.return_value = 1
     popen_mock.return_value = p
