@@ -52,7 +52,7 @@ def _bibtex(aux_filepath, verbose):
     try:
         p = subprocess.Popen(['bibtex', aux_filename], cwd=cwd,
                              stdout=stdout, stderr=stderr)
-    except FileNotFoundError:
+    except OSError:  # Common for py 2 and 3 and parent of FileNotFoundError
         raise BibtexException(
             'bibtex is not available on your system. '
             'Using a fallback citation method instead'

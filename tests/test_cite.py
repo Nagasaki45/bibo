@@ -1,4 +1,9 @@
 import click
+import pytest
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from bibo import cite
 
@@ -26,3 +31,21 @@ def test_cite_complex2(database):
 def test_cite_no_keys(database):
     result = cite.cite([], database)
     assert result == {}
+
+
+@mock.patch('subprocess.Popen')
+def test_cite_missing_bibtex(popen_mock, database):
+    popen_mock.side_effect = OSError()
+    with pytest.raises(cite.BibtexException) as e:
+        cite.cite(['tolkien1937'], database)
+    assert 'not available' in str(e.value)
+
+
+@mock.patch('subprocess.Popen')
+def test_cite_bibtex_issues(popen_mock, database):
+    p = mock.Mock()
+    p.wait.return_value = 1
+    popen_mock.return_value = p
+    with pytest.raises(cite.BibtexException) as e:
+        cite.cite(['tolkien1937'], database)
+    assert 'bibtex failed' in str(e)

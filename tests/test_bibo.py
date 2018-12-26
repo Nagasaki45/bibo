@@ -212,3 +212,23 @@ def test_add_to_empty_database(runner, tmpdir):
 
     with open(database) as f:
         assert 'The emotional dog' in f.read()
+
+
+@mock.patch('subprocess.Popen')
+def test_list_missing_bibtex(popen_mock, runner, database):
+    popen_mock.side_effect = OSError()
+    result = runner.invoke(bibo.cli, ['--database', database, 'list'])
+    assert result.exit_code == 0
+    assert 'Using a fallback citation' in result.output
+    assert 'verbose' not in result.output
+
+
+@mock.patch('subprocess.Popen')
+def test_list_missing_bibtex(popen_mock, runner, database):
+    p = mock.Mock()
+    p.wait.return_value = 1
+    popen_mock.return_value = p
+    result = runner.invoke(bibo.cli, ['--database', database, 'list'])
+    assert result.exit_code == 0
+    assert 'Using a fallback citation' in result.output
+    assert 'verbose' in result.output
