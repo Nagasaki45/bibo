@@ -8,7 +8,9 @@ import tempfile
 
 
 class BibtexException(Exception):
-    pass
+    def __init__(self, msg, use_verbose=False):
+        super(BibtexException, self).__init__(msg)
+        self.use_verbose = use_verbose
 
 
 def cite(keys, database, bibstyle='plain', verbose=False):
@@ -53,17 +55,10 @@ def _bibtex(aux_filepath, verbose):
         p = subprocess.Popen(['bibtex', aux_filename], cwd=cwd,
                              stdout=stdout, stderr=stderr)
     except OSError:  # Common for py 2 and 3 and parent of FileNotFoundError
-        raise BibtexException(
-            'bibtex is not available on your system. '
-            'Using a fallback citation method instead'
-        )
+        raise BibtexException('bibtex is not available')
     p.wait()
     if p.returncode != 0:
-        raise BibtexException(
-            'Citation generation with bibtex failed. '
-            'Using a fallback citation method instead. '
-            'Use --verbose for more information'
-        )
+        raise BibtexException('bibtex failed', use_verbose=True)
 
 
 bibitem_pattern = re.compile(r'^\\bibitem(\[.*\])?\{(?P<key>.*)\}\n')

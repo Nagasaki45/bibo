@@ -81,7 +81,10 @@ def _list_citations(entries, database, bibstyle, verbose):
         click.echo('\n'.join(parts))
 
     if exception is not None:
-        click.secho(str(exception), fg='red')
+        parts = [str(exception), 'Using a fallback citation method']
+        if exception.use_verbose:
+            parts.append('Use --verbose for more information')
+        click.secho('. '.join(parts), fg='red')
 
 
 @cli.command('open', short_help='Open the file linked to an entry.')
