@@ -1,6 +1,6 @@
 import os
 
-from bibo import pybibs
+import pybibs
 
 
 def test_read_string(raw):

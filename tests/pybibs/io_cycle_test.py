@@ -1,6 +1,6 @@
 import os
 
-from bibo import pybibs
+import pybibs
 
 
 def test_read_then_write_produces_the_same_result(database):

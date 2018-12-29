@@ -1,4 +1,4 @@
-from bibo.pybibs import _internals
+from pybibs import _internals
 
 
 def test_split_entries(raw):

@@ -1,4 +1,4 @@
-from bibo import pybibs
+import pybibs
 
 
 def test_write_string(raw, parsed):
