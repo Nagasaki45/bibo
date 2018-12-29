@@ -1,8 +1,9 @@
 import shutil
 
 import click.testing 
-import pybibs
 import pytest
+
+from bibo import pybibs
 
 
 @pytest.fixture()

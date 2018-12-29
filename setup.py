@@ -75,7 +75,6 @@ setup(
     install_requires=[
         'click',
         'click-plugins',
-        'pybibs',
         'pyperclip',
     ],
 

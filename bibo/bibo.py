@@ -8,11 +8,11 @@ import sys
 
 import click
 import click_plugins
-import pybibs
 import pyperclip
 
 from . import cite
 from . import internals
+from . import pybibs
 from . import query
 
 PATH_OPTION = click.Path(writable=True, readable=True, dir_okay=False)
