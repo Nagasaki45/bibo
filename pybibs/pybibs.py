@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from . import _internals
 
 
@@ -21,7 +23,7 @@ def read_string(string):
 
 
 def read_entry_string(raw_entry):
-    entry = {'fields': {}}
+    entry = {'fields': OrderedDict()}
     raw_entry = raw_entry.strip()
     assert raw_entry[0] == '@'
     raw_entry = raw_entry[1:]

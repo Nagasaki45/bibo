@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import pytest
 
 
@@ -25,21 +27,21 @@ def parsed():
             'key': 'israel',
             'type': 'article',
             'fields':
-            {
-                'author': 'Israel, Moshe',
-                'title': 'Article title',
-                'year': '2008',
-            },
+            OrderedDict([
+                ('author', 'Israel, Moshe'),
+                ('title', 'Article title'),
+                ('year', '2008'),
+            ]),
         },
         {
             'key': 'orwell',
             'type': 'book',
             'fields':
-            {
-                'author': 'Orwell, George',
-                'title': '1984',
-                'year': '1949',
-            },
+            OrderedDict([
+                ('author', 'Orwell, George'),
+                ('title', '1984'),
+                ('year', '1949'),
+            ]),
         },
     ]
 
