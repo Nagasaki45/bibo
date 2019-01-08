@@ -8,6 +8,7 @@ except ImportError:
 import click
 
 from bibo import bibo
+import pybibs
 
 TO_ADD = '''
 @article{haidt2001emotional,
@@ -177,6 +178,13 @@ def test_edit_key(runner, database):
         assert '@book{asimov_rules' in f.read()
 
 
+def test_edit_key_duplicate(runner, database):
+    args = ['--database', database, 'edit', '--key', 'tolkien1937hobit', 'asimov']
+    result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 1
+    assert 'duplicate' in result.output.lower()
+
+
 def test_edit_file(runner, database, example_pdf, tmpdir):
     args = ['--database', database, 'edit', '--file', example_pdf, 'asimov']
     result = runner.invoke(bibo.cli, args)
@@ -232,3 +240,17 @@ def test_list_failing_bibtex(popen_mock, runner, database):
     assert result.exit_code == 0
     assert 'Using a fallback citation' in result.output
     assert 'verbose' in result.output
+
+
+def test_add_duplicate_key(runner, database):
+    # Use pybibs to get the first entry in the DB to re-add
+    args = ['--database', database, 'list', '--raw']
+    result = runner.invoke(bibo.cli, args)
+    data = pybibs.read_string(result.output)
+    to_add = pybibs.write_string([data[0]])
+
+    with mock.patch('click.edit') as edit_mock:
+        edit_mock.return_value = to_add
+        result = runner.invoke(bibo.cli, ['--database', database, 'add'])
+    assert result.exit_code == 1
+    assert 'duplicate' in result.output.lower()

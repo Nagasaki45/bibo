@@ -112,6 +112,9 @@ def add(ctx, destination, **kwargs):
     data = ctx.obj['data']
     bib = click.edit(text=pyperclip.paste())
     entry = pybibs.read_entry_string(bib)
+
+    unique_key_validation(entry['key'], data)
+
     data.append(entry)
 
     if file_:
@@ -160,6 +163,7 @@ def edit(ctx, search_terms, key, field, destination, **kwargs):
     if type_:
         entry['type'] = type_
     if key:
+        unique_key_validation(key, data)
         entry['key'] = key
     if file_:
         internals.set_file(data, entry, file_, destination)
@@ -177,6 +181,12 @@ def file_validation(file_, destination):
             'destination',
             'Specifying destination without a file is meaningless.',
         )
+
+
+def unique_key_validation(new_key, data):
+    if new_key in (e['key'] for e in data):
+        raise click.ClickException('Duplicate key, command aborted')
+
 
 if __name__ == '__main__':
     cli()
