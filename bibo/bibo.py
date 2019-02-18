@@ -110,7 +110,7 @@ def add(ctx, destination, **kwargs):
     file_validation(file_, destination)
 
     data = ctx.obj['data']
-    bib = click.edit(text=pyperclip.paste())
+    bib = internals.editor(text=pyperclip.paste())
     entry = pybibs.read_entry_string(bib)
 
     unique_key_validation(entry['key'], data)
@@ -169,7 +169,7 @@ def edit(ctx, search_terms, key, field, destination, **kwargs):
         internals.set_file(data, entry, file_, destination)
     if field:
         current_value = entry['fields'].get(field, '')
-        updated_value = click.edit(text=current_value).strip()
+        updated_value = internals.editor(text=current_value).strip()
         entry['fields'][field] = updated_value
 
     pybibs.write_file(data, ctx.obj['database'])

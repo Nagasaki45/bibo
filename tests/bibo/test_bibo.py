@@ -130,6 +130,15 @@ def test_add_file_with_destination(runner, database, example_pdf, tmpdir):
     assert os.path.isfile(str(destination / 'haidt2001emotional.pdf'))
 
 
+def test_add_without_saving(runner, database):
+    with mock.patch('click.edit') as edit_mock:
+        edit_mock.return_value = None
+        args = ['--database', database, 'add']
+        result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 1
+    assert 'editor exited' in result.output.lower()
+
+
 def test_remove(runner, database):
     args = ['--database', database, 'remove', 'asimov']
     result = runner.invoke(bibo.cli, args)
@@ -207,6 +216,15 @@ def test_edit_field(runner, database):
 
     with open(database) as f:
         assert 'title = {THE HOBBIT!}' in f.read()
+
+
+def test_edit_field_without_saving(runner, database):
+    args = ['--database', database, 'edit', '--field', 'title', 'asimov']
+    with mock.patch('click.edit') as edit_mock:
+        edit_mock.return_value = None
+        result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 1
+    assert 'editor exited' in result.output.lower()
 
 
 def test_add_to_empty_database(runner, tmpdir):

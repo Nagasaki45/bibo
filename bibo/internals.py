@@ -93,3 +93,14 @@ def set_file(data, entry, file_, destination=None):
     path = os.path.join(destination, entry['key'] + file_extension)
     entry['fields']['file'] = path
     shutil.copy(file_, path)
+
+
+def editor(*args, **kwargs):
+    '''
+    Wrapper for `click.edit` that raises an error when None is returned.
+    '''
+    result = click.edit(*args, **kwargs)
+    if result is None:
+        msg = 'Editor exited without saving, command aborted'
+        raise click.ClickException(msg)
+    return result
