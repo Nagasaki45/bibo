@@ -63,7 +63,7 @@ When running bibo you should tell it where your ``.bib`` file is. For example, t
 
     bibo --database /path/to/your/database.bib list
 
-If you don't yet have a ``.bib`` file, or want to start working on a new one just pass a path to where you want your ``.bib`` file to be and bibo will create the new file for you.
+If you don't yet have a ``.bib`` file, or want to start working on a new one pass a path to where you want your ``.bib`` file to be and bibo will create the new file for you.
 
 
 The ``BIBO_DATABASE`` environment variable
