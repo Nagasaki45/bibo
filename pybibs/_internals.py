@@ -1,3 +1,6 @@
+import re
+
+
 def split_entries(string):
     depth = 0
     start = 0
@@ -12,13 +15,67 @@ def split_entries(string):
                 yield string[start:i + 1]
 
 
-def parse_raw_key_values(key_values):
-    for line in key_values.splitlines():
-        if line:
-            key, value = line.split('=', 1)
-            key = key.strip().lower()
-            value = parse_value(value)
-            yield key, value
+def is_before_key(char, previous):
+    return re.match(r'\s', char)
+
+
+def is_key(char, previous):
+    return char.isalpha()
+
+
+def is_between(char, previous):
+    together = ''.join(previous + [char])
+    if re.match(r'^\s*=?\s*$', together):
+        return True
+
+
+def is_value(char, previous):
+    if previous and previous[0] == '{' and previous[-1] == '}':
+        depth = 0
+        for x in previous:
+            if x == '{':
+                depth += 1
+            elif x == '}':
+                depth -= 1
+        if depth == 0:
+            return False
+    if len(previous) > 1 and previous[0] == previous[-1] == '"':
+        return False
+    if previous and previous[0] not in '{"' and char == ',':
+        return False
+    return True
+
+
+def is_separator(char, previous):
+    if char == ',':
+        return True
+
+
+def parse_raw_key_values(string):
+    string = iter(re.sub(r'\s+', ' ', string))
+    checks =   [is_before_key, is_key, is_between, is_value, is_separator]
+    contents = [[],            [],     [],         [],       []]
+    current = 0
+    char = next(string)
+    try:
+        while True:
+            if checks[current](char, contents[current]):
+                contents[current].append(char)
+                char = next(string)
+            else:
+                current += 1
+                if current == len(checks):
+                    key = parse_key(''.join(contents[1]))
+                    value = parse_value(''.join(contents[3]))
+                    yield key, value
+                    contents = [[], [], [], [], []]
+                    current = 0
+    except StopIteration:
+        pass
+
+
+def parse_key(key):
+    return key.lower()
 
 
 def parse_value(value):

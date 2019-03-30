@@ -21,6 +21,37 @@ def raw():
 
 
 @pytest.fixture()
+def multiline_entry():
+    return """
+@article{israel,
+    author = {Israel, Moshe and
+        Yosef, Shlomo}
+}
+""".strip()
+
+
+@pytest.fixture()
+def bens_multiline_entry():
+    return """
+@ARTICLE{2019arXiv190304691L,
+   author = {{Law}, C.~J. and {Margalit}, B. and {Palliyaguru}, N.~T. and 
+	{Metzger}, B.~D. and {Sironi}, L. and {Zheng}, Y. and {Berger}, E. and 
+	{Margutti}, R. and {Beloborodov}, A. and {Nicholl}, M. and {Eftekhari}, T. and 
+	{Vurm}, I. and {Williams}, P.~K.~G.},
+    title = "{Radio Time-Domain Signatures of Magnetar Birth}",
+  journal = {arXiv e-prints},
+archivePrefix = "arXiv",
+   eprint = {1903.04691},
+ primaryClass = "astro-ph.HE",
+ keywords = {Astrophysics - High Energy Astrophysical Phenomena},
+     year = 2019,
+    month = mar,
+   adsurl = {http://adsabs.harvard.edu/abs/2019arXiv190304691L},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}""".strip()
+
+
+@pytest.fixture()
 def parsed():
     return [
         {
