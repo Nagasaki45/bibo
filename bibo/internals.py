@@ -7,7 +7,6 @@ import re
 import shutil
 import subprocess
 import sys
-import unicodedata
 
 import click
 
@@ -90,10 +89,9 @@ def remove_entry(data, entry):
 
 def string_to_basename(s):
     '''
-    Normalizes string, converts to lowercase, removes non-alpha characters,
+    Converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
     '''
-    s = unicodedata.normalize('NFKD', s)
     s = s.strip().lower()
     s = re.sub(r'[^\w\s-]', '', s)
     return re.sub(r'[\s-]+', '-', s)
