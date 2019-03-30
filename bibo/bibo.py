@@ -3,6 +3,7 @@ Command line reference manager with a single source of truth: the .bib file.
 Inspired by beets.
 """
 
+import os
 import pkg_resources
 import sys
 
@@ -36,7 +37,7 @@ SEARCH_TERMS_OPTION = click.argument('search_terms', nargs=-1)
 @click.pass_context
 def cli(ctx, database):
     ctx.ensure_object(dict)
-    ctx.obj['database'] = database
+    ctx.obj['database'] = os.path.abspath(database)
 
     # Read the database. Create (in memory) if doesn't exist
     try:

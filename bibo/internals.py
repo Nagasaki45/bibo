@@ -89,6 +89,7 @@ def remove_entry(data, entry):
 def set_file(data, entry, file_, destination=None):
     if not destination:
         destination = destination_heuristic(data)
+    destination = os.path.abspath(destination)
     _, file_extension = os.path.splitext(file_)
     path = os.path.join(destination, entry['key'] + file_extension)
     entry['fields']['file'] = path

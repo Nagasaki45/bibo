@@ -272,3 +272,11 @@ def test_add_duplicate_key(runner, database):
         result = runner.invoke(bibo.cli, ['--database', database, 'add'])
     assert result.exit_code == 1
     assert 'duplicate' in result.output.lower()
+
+
+def test_bibtex_error_with_relative_path(runner):
+    '''Issue #32.'''
+    # This is the same DB as usual, but using relative path
+    database = os.path.join('tests', 'bibo', 'test.bib')
+    result = runner.invoke(bibo.cli, ['--database', database, 'list'])
+    assert 'bibtex failed' not in result.output
