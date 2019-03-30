@@ -52,26 +52,24 @@ def is_separator(char, previous):
 
 
 def parse_raw_key_values(string):
-    string = iter(re.sub(r'\s+', ' ', string))
+    string = re.sub(r'\s+', ' ', string)
     checks =   [is_before_key, is_key, is_between, is_value, is_separator]
     contents = [[],            [],     [],         [],       []]
     current = 0
-    char = next(string)
-    try:
-        while True:
-            if checks[current](char, contents[current]):
-                contents[current].append(char)
-                char = next(string)
-            else:
-                current += 1
-                if current == len(checks):
-                    key = parse_key(''.join(contents[1]))
-                    value = parse_value(''.join(contents[3]))
-                    yield key, value
-                    contents = [[], [], [], [], []]
-                    current = 0
-    except StopIteration:
-        pass
+    char_index = 0
+    while char_index < len(string):
+        char = string[char_index]
+        if checks[current](char, contents[current]):
+            contents[current].append(char)
+            char_index += 1
+        else:
+            current += 1
+            if current == len(checks):
+                key = parse_key(''.join(contents[1]))
+                value = parse_value(''.join(contents[3]))
+                yield key, value
+                contents = [[], [], [], [], []]
+                current = 0
 
 
 def parse_key(key):
