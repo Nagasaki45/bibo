@@ -3,9 +3,11 @@
 import collections
 import itertools
 import os
+import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 
 import click
 
@@ -86,12 +88,24 @@ def remove_entry(data, entry):
     data.remove(entry)
 
 
+def string_to_basename(s):
+    '''
+    Normalizes string, converts to lowercase, removes non-alpha characters,
+    and converts spaces to hyphens.
+    '''
+    s = unicodedata.normalize('NFKD', s)
+    s = s.strip().lower()
+    s = re.sub(r'[^\w\s-]', '', s)
+    return re.sub(r'[\s-]+', '-', s)
+
+
 def set_file(data, entry, file_, destination=None):
     if not destination:
         destination = destination_heuristic(data)
     destination = os.path.abspath(destination)
     _, file_extension = os.path.splitext(file_)
-    path = os.path.join(destination, entry['key'] + file_extension)
+    basename = string_to_basename(entry['key'])
+    path = os.path.join(destination, basename + file_extension)
     entry['fields']['file'] = path
     shutil.copy(file_, path)
 
