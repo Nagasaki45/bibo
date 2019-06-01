@@ -130,7 +130,7 @@ def get_database(args, envvars):
     for arg_a, arg_b in zip(args, args[1:]):
         if arg_a == '--database':
             return arg_b
-    return os.environ.get(BIBO_DATABASE_ENV_VAR)
+    return envvars.get(BIBO_DATABASE_ENV_VAR)
 
 
 def complete_key(ctx, args, incomplete):
