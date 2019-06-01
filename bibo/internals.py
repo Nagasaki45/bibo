@@ -10,6 +10,10 @@ import sys
 
 import click
 
+import pybibs
+
+BIBO_DATABASE_ENV_VAR = 'BIBO_DATABASE'
+
 
 def header(entry):
     parts = [click.style(entry['key'], fg='green')]
@@ -117,3 +121,35 @@ def editor(*args, **kwargs):
         msg = 'Editor exited without saving, command aborted'
         raise click.ClickException(msg)
     return result
+
+
+def get_database(args, envvars):
+    '''
+    Try to find the database, either from arguments or environment var.
+    '''
+    for arg_a, arg_b in zip(args, args[1:]):
+        if arg_a == '--database':
+            return arg_b
+    return os.environ.get(BIBO_DATABASE_ENV_VAR)
+
+
+def complete_key(ctx, args, incomplete):
+    '''
+    Autocompletion for keys.
+    '''
+    database = get_database(args, os.environ)
+    if database:
+        data = load_database(database)
+    else:
+        data = []
+    return [x['key'] for x in data if incomplete.lower() in x['key'].lower()]
+
+
+def load_database(database):
+    '''
+    Load the database from .bib. Create (in memory) if doesn't exist.
+    '''
+    try:
+        return pybibs.read_file(database)
+    except IOError:
+        return []

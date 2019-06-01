@@ -27,23 +27,22 @@ DESTINATION_OPTION = click.option(
     help='A folder to put the file in.',
     type=click.Path(exists=True, readable=True, dir_okay=True, file_okay=False),
 )
-SEARCH_TERMS_OPTION = click.argument('search_terms', nargs=-1)
+SEARCH_TERMS_OPTION = click.argument(
+    'search_terms',
+    nargs=-1,
+    autocompletion=internals.complete_key,
+)
 
 
 @click_plugins.with_plugins(pkg_resources.iter_entry_points('bibo.plugins'))
 @click.group(help=__doc__)
-@click.option('--database', envvar='BIBO_DATABASE', help='A .bib file.',
-              required=True, type=PATH_OPTION)
+@click.option('--database', envvar=internals.BIBO_DATABASE_ENV_VAR,
+              help='A .bib file.', required=True, type=PATH_OPTION)
 @click.pass_context
 def cli(ctx, database):
     ctx.ensure_object(dict)
     ctx.obj['database'] = os.path.abspath(database)
-
-    # Read the database. Create (in memory) if doesn't exist
-    try:
-        ctx.obj['data'] = pybibs.read_file(database)
-    except IOError:
-        ctx.obj['data'] = []
+    ctx.obj['data'] = internals.load_database(database)
 
 
 @cli.command('list', short_help='List entries.')
