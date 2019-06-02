@@ -148,3 +148,21 @@ Most of bibo's commands expect you to provide search terms. Some of them, like t
 
 .. _beets: https://github.com/beetbox/beets
 .. _`official packages installation guide`: https://packaging.python.org/tutorials/installing-packages/
+
+
+Auto-complete
+=============
+
+To activate auto-complete, if you're using Bash add the following to your ``.bashrc``
+
+.. code-block:: bash
+
+    eval "$(_FOO_BAR_COMPLETE=source foo-bar)"
+
+If you're on zsh add this to your ``.zshrc``
+
+.. code-block:: bash
+
+    eval "$(_FOO_BAR_COMPLETE=source_zsh foo-bar)"
+
+Now, while in the middle of a command, press <TAB> to auto-complete options, arguments, or keys from your ``.bib`` database.
