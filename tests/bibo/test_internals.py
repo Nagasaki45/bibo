@@ -33,3 +33,8 @@ def test_set_file_with_destination(data, example_pdf, tmpdir):
     os.mkdir(str(destination))
     internals.set_file(data, entry, example_pdf, str(destination))
     assert os.path.exists(str(destination / entry['key'] + '.pdf'))
+
+
+def test_get_database():
+    args = ['whatever', '--database', 'test.bib', 'whatever']
+    assert internals.get_database(args) == 'test.bib'

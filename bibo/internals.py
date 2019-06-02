@@ -123,21 +123,17 @@ def editor(*args, **kwargs):
     return result
 
 
-def get_database(args, envvars):
-    '''
-    Try to find the database, either from arguments or environment var.
-    '''
+def get_database(args):
     for arg_a, arg_b in zip(args, args[1:]):
         if arg_a == '--database':
             return arg_b
-    return envvars.get(BIBO_DATABASE_ENV_VAR)
 
 
 def complete_key(ctx, args, incomplete):
     '''
     Autocompletion for keys.
     '''
-    database = get_database(args, os.environ)
+    database = get_database(args) or os.environ.get(BIBO_DATABASE_ENV_VAR)
     if database:
         data = load_database(database)
     else:
