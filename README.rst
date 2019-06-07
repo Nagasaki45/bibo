@@ -157,12 +157,12 @@ To activate auto-complete, if you're using Bash add the following to your ``.bas
 
 .. code-block:: bash
 
-    eval "$(_FOO_BAR_COMPLETE=source foo-bar)"
+    eval "$(_BIBO_COMPLETE=source bibo)"
 
 If you're on zsh add this to your ``.zshrc``
 
 .. code-block:: bash
 
-    eval "$(_FOO_BAR_COMPLETE=source_zsh foo-bar)"
+    eval "$(_BIBO_COMPLETE=source_zsh bibo)"
 
 Now, while in the middle of a command, press <TAB> to auto-complete options, arguments, or keys from your ``.bib`` database.
