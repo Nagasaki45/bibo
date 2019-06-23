@@ -129,17 +129,15 @@ def add(ctx, destination, **kwargs):
 @click.pass_context
 def remove(ctx, search_terms, field):
     data = ctx.obj['data']
+    entry = query.get(data, search_terms)
 
-    entries = [e for e in query.search(data, search_terms)]
-
-    for entry in entries:
-        if field is None:
-            data.remove(entry)
+    if field is None:
+        data.remove(entry)
+    else:
+        if field in entry['fields']:
+            del entry['fields'][field]
         else:
-            if field in entry['fields']:
-                del entry['fields'][field]
-            else:
-                click.echo('No such field')
+            click.echo('No such field')
 
     pybibs.write_file(data, ctx.obj['database'])
 

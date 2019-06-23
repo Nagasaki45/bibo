@@ -272,3 +272,12 @@ def test_bibtex_error_with_relative_path(runner):
     database = os.path.join('tests', 'bibo', 'test.bib')
     result = runner.invoke(bibo.cli, ['--database', database, 'list'])
     assert 'bibtex failed' not in result.output
+
+
+def test_remove_one_entry_at_a_time(runner, database):
+    result = runner.invoke(bibo.cli, ['--database', database, 'remove'])
+    assert result.exit_code == 1
+    result = runner.invoke(bibo.cli, ['--database', database, 'remove', 'tolkien'])
+    assert result.exit_code == 1
+    result = runner.invoke(bibo.cli, ['--database', database, 'remove', 'lord of the rings'])
+    assert result.exit_code == 0
