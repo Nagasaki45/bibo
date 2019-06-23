@@ -77,20 +77,6 @@ def destination_heuristic(data):
         )
 
 
-def remove_entry(data, entry):
-    '''
-    Remove an entry in place.
-    '''
-    file_field = entry['fields'].get('file')
-    if file_field:
-        try:
-            os.remove(file_field)
-        except IOError:
-            click.echo('This entry\'s file was missing')
-
-    data.remove(entry)
-
-
 def string_to_basename(s):
     '''
     Converts to lowercase, removes non-alpha characters,

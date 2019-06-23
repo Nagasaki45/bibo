@@ -134,7 +134,7 @@ def remove(ctx, search_terms, field):
 
     for entry in entries:
         if field is None:
-            internals.remove_entry(data, entry)
+            data.remove(entry)
         else:
             if field in entry['fields']:
                 del entry['fields'][field]
