@@ -36,6 +36,7 @@ SEARCH_TERMS_OPTION = click.argument(
 
 @click_plugins.with_plugins(pkg_resources.iter_entry_points('bibo.plugins'))
 @click.group(help=__doc__)
+@click.version_option()
 @click.option('--database', envvar=internals.BIBO_DATABASE_ENV_VAR,
               help='A .bib file.', required=True, type=PATH_OPTION)
 @click.pass_context
