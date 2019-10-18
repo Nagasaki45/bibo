@@ -121,21 +121,15 @@ If you have a single entry in the database by Albert Einstein (more about search
 ``edit``
 ~~~~~~~~
 
-The ``edit`` command allows you to edit a single entry. You can set the type by running, for example
+The ``edit`` command allows you to edit a single entry by key. You can set a field / key / type by running, for example
 
 .. code-block:: bash
 
-    bibo edit Albert Einstein --type article
+    bibo edit einstein_paper tags=interesting
 
-Setting the key is the same.
+Setting the key / type is the same.
 
-To edit a field run, for example
-
-.. code-block:: bash
-
-    bibo edit Albert Einstein --field title
-
-Your editor will open with the current content of the title field (or empty if there was no title). Saving will update the database.
+If the value is omitted your editor will open with the current content of the field (or empty if there was no title). Saving will update the database.
 
 The ``edit`` command is also used to link a file to the entry. It is done exactly the same way as the ``add`` command.
 
