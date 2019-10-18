@@ -125,7 +125,7 @@ def add(ctx, destination, **kwargs):
 
 
 @cli.command(short_help='Remove an entry or a field.')
-@click.argument('key')
+@click.argument('key', autocompletion=internals.complete_key)
 @click.argument('field', nargs=-1)
 @click.pass_context
 def remove(ctx, key, field):
@@ -145,7 +145,7 @@ def remove(ctx, key, field):
 
 
 @cli.command(short_help='Edit an entry.')
-@click.argument('key')
+@click.argument('key', autocompletion=internals.complete_key)
 @click.argument('field_value', nargs=-1)
 @FILE_OPTION
 @DESTINATION_OPTION
