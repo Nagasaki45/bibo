@@ -77,3 +77,10 @@ def get(data, search_terms):
         raise click.ClickException('Multiple entries found')
 
     return entry
+
+
+def get_by_key(data, key):
+    for entry in data:
+        if entry['key'] == key:
+            return entry
+    raise click.ClickException('Couldn\'t find"{}"'.format(key))

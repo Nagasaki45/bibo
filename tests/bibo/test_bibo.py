@@ -160,7 +160,7 @@ def test_remove_field(runner, database):
 
 
 def test_edit_type(runner, database):
-    args = ['--database', database, 'edit', '--type', 'comics', 'asimov']
+    args = ['--database', database, 'edit', 'asimov1951foundation', 'type=comics']
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''
@@ -170,24 +170,24 @@ def test_edit_type(runner, database):
 
 
 def test_edit_key(runner, database):
-    args = ['--database', database, 'edit', '--key', 'asimov_rules', 'asimov']
+    args = ['--database', database, 'edit', 'asimov1951foundation', 'key=asimov_rules']
     result = runner.invoke(bibo.cli, args)
-    assert result.exit_code == 0
     assert result.output == ''
+    assert result.exit_code == 0
 
     with open(database) as f:
         assert '@book{asimov_rules' in f.read()
 
 
 def test_edit_key_duplicate(runner, database):
-    args = ['--database', database, 'edit', '--key', 'tolkien1937hobit', 'asimov']
+    args = ['--database', database, 'edit', 'asimov1951foundation', 'key=tolkien1937hobit']
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 1
     assert 'duplicate' in result.output.lower()
 
 
 def test_edit_file(runner, database, example_pdf, tmpdir):
-    args = ['--database', database, 'edit', '--file', example_pdf, 'asimov']
+    args = ['--database', database, 'edit', 'asimov1951foundation', '--file', example_pdf]
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''
@@ -200,8 +200,16 @@ def test_edit_file(runner, database, example_pdf, tmpdir):
     assert filecmp.cmp(example_pdf, expected_pdf)
 
 
-def test_edit_field(runner, database):
-    args = ['--database', database, 'edit', '--field', 'title', 'asimov']
+def test_edit_field_with_value(runner, database):
+    args = ['--database', database, 'edit', 'asimov1951foundation', 'title=I, robot']
+    result = runner.invoke(bibo.cli, args)
+
+    with open(database) as f:
+        assert 'title = {I, robot}' in f.read()
+
+
+def test_edit_field_no_value(runner, database):
+    args = ['--database', database, 'edit', 'asimov1951foundation', 'title']
     with mock.patch('click.edit') as edit_mock:
         edit_mock.return_value = 'THE HOBBIT!'
         result = runner.invoke(bibo.cli, args)
@@ -211,12 +219,25 @@ def test_edit_field(runner, database):
 
 
 def test_edit_field_without_saving(runner, database):
-    args = ['--database', database, 'edit', '--field', 'title', 'asimov']
+    args = ['--database', database, 'edit', 'asimov1951foundation', 'title']
     with mock.patch('click.edit') as edit_mock:
         edit_mock.return_value = None
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 1
     assert 'editor exited' in result.output.lower()
+
+
+def test_edit_multiple_fields(runner, database):
+    args = ['--database', database, 'edit', 'asimov1951foundation',
+            'title=I, robot', 'year=1950']
+    result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
+
+    with open(database) as f:
+        data = pybibs.read_string(f.read())
+        entry = bibo.query.get(data, 'asimov')
+        assert entry['fields']['title'] == 'I, robot'
+        assert entry['fields']['year'] == '1950'
 
 
 def test_add_to_empty_database(runner, tmpdir):

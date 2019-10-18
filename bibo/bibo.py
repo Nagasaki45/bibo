@@ -144,32 +144,41 @@ def remove(ctx, search_terms, field):
 
 
 @cli.command(short_help='Edit an entry.')
-@SEARCH_TERMS_OPTION
-@click.option('--type', help='Set the type.')
-@click.option('--key', help='Set the key.')
+@click.argument('key')
+@click.argument('field_value', nargs=-1)
 @FILE_OPTION
 @DESTINATION_OPTION
-@click.option('--field', help='Field to edit.')
 @click.pass_context
-def edit(ctx, search_terms, key, field, destination, **kwargs):
-    type_ = kwargs.pop('type')
+def edit(ctx, key, field_value, destination, **kwargs):
+    '''
+    FIELD_VALUE
+
+    To set fields: author=Einstein tags=interesting.
+    Leave the value empty to open in editor.
+    Set the key / type in the same way.
+    '''
     file_ = kwargs.pop('file')
     file_validation(file_, destination)
 
     data = ctx.obj['data']
-    entry = query.get(data, search_terms)
+    entry = query.get_by_key(data, key)
 
-    if type_:
-        entry['type'] = type_
-    if key:
-        unique_key_validation(key, data)
-        entry['key'] = key
     if file_:
         internals.set_file(data, entry, file_, destination)
-    if field:
-        current_value = entry['fields'].get(field, '')
-        updated_value = internals.editor(text=current_value).strip()
-        entry['fields'][field] = updated_value
+    for fv in field_value:
+        if '=' in fv:
+            field, value = fv.split('=')
+        else:
+            field = fv
+            current_value = entry['fields'].get(field, '')
+            value = internals.editor(text=current_value).strip()
+        if field == 'key':
+            unique_key_validation(value, data)
+            entry['key'] = value
+        elif field == 'type':
+            entry['type'] = value
+        else:
+            entry['fields'][field] = value
 
     pybibs.write_file(data, ctx.obj['database'])
 
