@@ -125,20 +125,21 @@ def add(ctx, destination, **kwargs):
 
 
 @cli.command(short_help='Remove an entry or a field.')
-@SEARCH_TERMS_OPTION
-@click.option('--field', help='Field to remove.')
+@click.argument('key')
+@click.argument('field', nargs=-1)
 @click.pass_context
-def remove(ctx, search_terms, field):
+def remove(ctx, key, field):
     data = ctx.obj['data']
-    entry = query.get(data, search_terms)
+    entry = query.get_by_key(data, key)
 
-    if field is None:
+    if not field:
         data.remove(entry)
     else:
-        if field in entry['fields']:
-            del entry['fields'][field]
-        else:
-            click.echo('No such field')
+        for f in field:
+            if f in entry['fields']:
+                del entry['fields'][f]
+            else:
+                click.echo('"{}" has no field "{}"'.format(key, f))
 
     pybibs.write_file(data, ctx.obj['database'])
 

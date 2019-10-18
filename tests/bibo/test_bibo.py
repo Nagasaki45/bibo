@@ -140,7 +140,7 @@ def test_add_without_saving(runner, database):
 
 
 def test_remove(runner, database):
-    args = ['--database', database, 'remove', 'asimov']
+    args = ['--database', database, 'remove', 'asimov1951foundation']
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''
@@ -150,7 +150,7 @@ def test_remove(runner, database):
 
 
 def test_remove_field(runner, database):
-    args = ['--database', database, 'remove', '--field', 'file', 'tolkien1937']
+    args = ['--database', database, 'remove', 'tolkien1937hobit', 'file']
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output == ''
@@ -297,8 +297,8 @@ def test_bibtex_error_with_relative_path(runner):
 
 def test_remove_one_entry_at_a_time(runner, database):
     result = runner.invoke(bibo.cli, ['--database', database, 'remove'])
-    assert result.exit_code == 1
+    assert result.exit_code != 0
     result = runner.invoke(bibo.cli, ['--database', database, 'remove', 'tolkien'])
-    assert result.exit_code == 1
-    result = runner.invoke(bibo.cli, ['--database', database, 'remove', 'lord of the rings'])
+    assert result.exit_code != 0
+    result = runner.invoke(bibo.cli, ['--database', database, 'remove', 'tolkien1937hobit'])
     assert result.exit_code == 0
