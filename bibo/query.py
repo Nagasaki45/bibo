@@ -31,7 +31,7 @@ def _is_matching(entry, search_term):
 
 def _is_matching_general_field(entry, search_value):
     searchables = itertools.chain(
-        entry['fields'].values(),
+        entry.get('fields', {}).values(),
         (entry[x] for x in ['key', 'type']),
     )
 
@@ -46,7 +46,7 @@ def _is_matching_specific_field(entry, search_field, search_value):
         return search_value in entry['key'].lower()
     if search_field == 'type':
         return search_value in entry['type'].lower()
-    for field, value in entry['fields'].items():
+    for field, value in entry.get('fields', {}).items():
         if search_field == field.lower():
             return search_value in value.lower()
     return False

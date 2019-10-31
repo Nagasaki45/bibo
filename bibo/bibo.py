@@ -66,7 +66,7 @@ def _list_raw(entries):
 
 
 def _list_citations(entries, database, bibstyle, verbose):
-    entries = list(entries)
+    entries = [e for e in entries if e['type'] != 'string']
     keys = [e['key'] for e in entries]
     exception = None
     try:
@@ -94,7 +94,7 @@ def _list_citations(entries, database, bibstyle, verbose):
 def open_(ctx, search_terms):
     entry = query.get(ctx.obj['data'], search_terms)
 
-    file_field = entry['fields'].get('file')
+    file_field = entry.get('fields', {}).get('file')
     if not file_field:
         click.echo('No file is associated with this entry')
         sys.exit(1)
@@ -134,12 +134,14 @@ def remove(ctx, key, field):
 
     if not field:
         data.remove(entry)
-    else:
+    elif 'fields' in entry:
         for f in field:
             if f in entry['fields']:
                 del entry['fields'][f]
             else:
                 click.echo('"{}" has no field "{}"'.format(key, f))
+    else:
+        click.echo('"{}" has no fields'.format(key))
 
     pybibs.write_file(data, ctx.obj['database'])
 
@@ -163,6 +165,9 @@ def edit(ctx, key, field_value, destination, **kwargs):
 
     data = ctx.obj['data']
     entry = query.get_by_key(data, key)
+
+    if entry['type'] == 'string':
+        raise click.ClickException('Editing @string entries is unsupported')
 
     if file_:
         internals.set_file(data, entry, file_, destination)
