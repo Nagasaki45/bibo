@@ -41,3 +41,11 @@ def test_read_bens_multiline(bens_multiline_entry):
     assert fields['title'] == expected_title
     assert fields['keywords'] == expected_keywords
     assert fields['year'] == '2019'
+
+
+def test_string_command():
+    raw = '@string{foo = "Mrs. Foo"}'
+    bib = pybibs.read_string(raw)
+    assert bib[0]['type'] == 'string'
+    assert bib[0]['key'] == 'foo'
+    assert bib[0]['val'] == 'Mrs. Foo'

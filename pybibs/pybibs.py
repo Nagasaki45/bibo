@@ -23,14 +23,23 @@ def read_string(string):
 
 
 def read_entry_string(raw_entry):
-    entry = {'fields': OrderedDict()}
     raw_entry = raw_entry.strip()
     assert raw_entry[0] == '@'
     raw_entry = raw_entry[1:]
     type_, rest = raw_entry.split('{', 1)
-    key, rest = rest.split(',', 1)
     assert rest[-1] == '}'
-    inner = rest[:-1]
+    rest = rest[:-1]
+
+    if type_ == 'string':
+        k, v = next(_internals.parse_raw_key_values(rest))
+        return {
+            'type': 'string',
+            'key': k,
+            'val': v,
+        }
+
+    entry = {'fields': OrderedDict()}
+    key, inner = rest.split(',', 1)
     for k, v in _internals.parse_raw_key_values(inner):
         entry['fields'][k] = v
     entry['key'] = key

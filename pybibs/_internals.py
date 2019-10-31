@@ -53,23 +53,27 @@ def is_separator(char, previous):
 
 def parse_raw_key_values(string):
     string = re.sub(r'\s+', ' ', string)
+    if not string.endswith(','):
+        string += ','
     checks =   [is_before_key, is_key, is_between, is_value, is_separator]
-    contents = [[],            [],     [],         [],       []]
+    content = []
     current = 0
     char_index = 0
+    key = ''
+    val = ''
     while char_index < len(string):
         char = string[char_index]
-        if checks[current](char, contents[current]):
-            contents[current].append(char)
+        if checks[current](char, content):
+            content.append(char)
             char_index += 1
         else:
-            current += 1
-            if current == len(checks):
-                key = parse_key(''.join(contents[1]))
-                value = parse_value(''.join(contents[3]))
-                yield key, value
-                contents = [[], [], [], [], []]
-                current = 0
+            if checks[current] == is_key:
+                key = parse_key(''.join(content))
+            elif checks[current] == is_value:
+                val = parse_value(''.join(content))
+                yield key, val
+            content = []
+            current = (current + 1) % len(checks)
 
 
 def parse_key(key):
@@ -92,6 +96,17 @@ def parse_value(value):
 
 
 def write_entry(entry):
+    if entry['type'] == 'string':
+        return write_string_entry(entry)
+    else:
+        return write_general_entry(entry)
+
+
+def write_string_entry(entry):
+    return '@string{{{} = "{}"}}'.format(entry['key'], entry['val'])
+
+
+def write_general_entry(entry):
     parts = []
     parts += ['@', entry['type'], '{', entry['key']]
     for k, v in entry['fields'].items():
