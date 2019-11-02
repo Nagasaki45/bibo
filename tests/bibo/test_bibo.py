@@ -68,25 +68,41 @@ def test_list_with_no_arguments_to_get_everything(runner, database, data):
 
 
 def test_open(runner, database):
-    with mock.patch('bibo.internals.open_file') as open_file_mock:
+    with mock.patch('bibo.internals.xdg_open') as xdg_open_mock:
         args = ['--database', database, 'open', 'tolkien1937']
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
-    assert open_file_mock.call_count == 1
+    assert xdg_open_mock.call_count == 1
 
 
 def test_open_no_file_field(runner, database):
-    with mock.patch('bibo.internals.open_file') as open_file_mock:
+    with mock.patch('bibo.internals.xdg_open') as xdg_open_mock:
         result = runner.invoke(bibo.cli, ['--database', database, 'open', 'asimov'])
     assert result.exit_code == 1
     assert 'No file' in result.output
 
 
 def test_open_no_entry(runner, database):
-    with mock.patch('bibo.internals.open_file') as open_file_mock:
+    with mock.patch('bibo.internals.xdg_open') as xdg_open_mock:
         result = runner.invoke(bibo.cli, ['--database', database, 'open', 'agnon'])
     assert result.exit_code == 1
     assert 'No entries' in result.output
+
+
+def test_open_url(runner, database):
+    with mock.patch('bibo.internals.xdg_open') as xdg_open_mock:
+        result = runner.invoke(bibo.cli, ['--database', database, 'open', 'lord of the rings'])
+    assert result.exit_code == 0
+    assert xdg_open_mock.call_count == 1
+    xdg_open_mock.assert_called_once_with('https://lotr.com')
+
+
+def test_open_doi(runner, database):
+    with mock.patch('bibo.internals.xdg_open') as xdg_open_mock:
+        result = runner.invoke(bibo.cli, ['--database', database, 'open', 'duncan'])
+    assert result.exit_code == 0
+    assert xdg_open_mock.call_count == 1
+    xdg_open_mock.assert_called_once_with('https://doi.org/10.1016/0022-1031(74)90070-5')
 
 
 def test_add(runner, database):

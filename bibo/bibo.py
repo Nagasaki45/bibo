@@ -88,18 +88,21 @@ def _list_citations(entries, database, bibstyle, verbose):
         click.secho('. '.join(parts), fg='red')
 
 
-@cli.command('open', short_help='Open the file linked to an entry.')
+@cli.command('open', short_help='Open the file / url / doi associated with an entry.')
 @SEARCH_TERMS_OPTION
 @click.pass_context
 def open_(ctx, search_terms):
     entry = query.get(ctx.obj['data'], search_terms)
 
-    file_field = entry.get('fields', {}).get('file')
-    if not file_field:
-        click.echo('No file is associated with this entry')
-        sys.exit(1)
-
-    internals.open_file(file_field)
+    for field_name in ['file', 'url', 'doi']:
+        value = entry.get('fields', {}).get(field_name)
+        if value:
+            if field_name == 'doi':
+                value = 'https://doi.org/' + value
+            internals.xdg_open(value)
+            break
+    else:
+        raise click.ClickException('No file / url / doi is associated with this entry')
 
 
 @cli.command(short_help='Add a new entry.')

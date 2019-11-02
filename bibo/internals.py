@@ -27,9 +27,9 @@ def header(entry):
     return ' '.join(parts)
 
 
-def open_file(filepath):
+def xdg_open(filepath):
     """
-    Open file with the default system app.
+    Open with the default system app.
     Copied from https://stackoverflow.com/a/435669/1224456
     """
     if sys.platform.startswith('darwin'):

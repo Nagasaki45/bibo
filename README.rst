@@ -115,7 +115,7 @@ Try running
     bibo open Albert Einstein
 
 
-If you have a single entry in the database by Albert Einstein (more about search terms below), and the ``file`` field is defined, bibo will open this file with an appropriate application. If it's a PDF it will probably be your PDF reader. But it can also be a presentation, ``.zip`` file, or even a folder.
+Lets assume that there's a single entry in the database by Albert Einstein (more about search terms below), and the ``file`` / ``url`` / ``doi`` field is defined. An ``open`` command will open the file / URL / DOI of this entry, with precedence following this order. A file will be opened with the appropriate application. If it's a PDF it will probably be your PDF reader. But it can also be a presentation, ``.zip`` file, or even a folder. URLs and DOIs would be opened by your web browser.
 
 
 ``edit``
