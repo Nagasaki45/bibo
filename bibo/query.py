@@ -1,4 +1,5 @@
 import itertools
+import re
 
 import click
 
@@ -53,11 +54,12 @@ def _is_matching_specific_field(entry, search_field, search_value):
 
 
 def _parse_search_term(search_term):
-    parts = search_term.split(':')
+    # Split unless preceded by '\'
+    parts = re.split(r'(?<!\\):', search_term)
     if len(parts) == 1:
-        return 'general', parts[0].lower()
+        return 'general', parts[0].lower().replace('\\:', ':')
     if len(parts) == 2:
-        return parts[0].lower(), parts[1].lower()
+        return parts[0].lower(), parts[1].lower().replace('\\:', ':')
     raise click.ClickException('Invalid search term')
 
 

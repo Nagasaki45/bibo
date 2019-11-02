@@ -45,3 +45,12 @@ def test_search_with_capitalized_search_term(data):
     results = list(query.search(data, ['ASIMOV']))
     assert len(results) == 1
     assert results[0]['fields']['title'] == 'Foundation'
+
+
+def test_search_with_escaped_colon(data):
+    '''Issue #47'''
+    results = list(query.search(data, ['Einstein:1935']))
+    assert len(results) == 0
+
+    results = list(query.search(data, ['Einstein\\:1935']))
+    assert len(results) == 1

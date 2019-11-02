@@ -139,6 +139,8 @@ The ``edit`` command is also used to link a file to the entry. It is done exactl
 
 Most of bibo's commands expect you to provide search terms. Some of them, like the ``open`` command, will only work if the search terms matches a single entry in the database. A single search term matches an entry if it appears in the type, key, or any of the fields of the entry. If multiple search terms are provided an entry should match all of them. Note that search terms are case insensitive. In addition, it is possible to match against a specific field with, for example ``author:einstein`` or ``year:2018``. You can match against type / key in a similar fashion, with, let's say ``type:book``.
 
+If a value you are searching for contains a colon escape the colon in your search term with ``\\``. For example, to query for the key ``Einstein:1935`` use ``Einstein\\:1935`` or ``"Einstein\:1935"``.
+
 
 .. _beets: https://github.com/beetbox/beets
 .. _`official packages installation guide`: https://packaging.python.org/tutorials/installing-packages/
