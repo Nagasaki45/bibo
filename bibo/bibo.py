@@ -50,12 +50,18 @@ def cli(ctx, database):
 @click.option('--raw', is_flag=True, help='Format as raw .bib entries')
 @click.option('--bibstyle', default='plain', help='Citation format')
 @click.option('--verbose', is_flag=True, help='Print verbose information')
+@click.option('--format', help='Format pattern')
 @SEARCH_TERMS_OPTION
 @click.pass_context
-def list_(ctx, search_terms, raw, bibstyle, verbose):
+def list_(ctx, search_terms, raw, bibstyle, verbose, **kwargs):
+    format_pattern = kwargs.pop('format')
+    assert not kwargs
+
     entries = query.search(ctx.obj['data'], search_terms)
     if raw:
         _list_raw(entries)
+    elif format_pattern:
+        _list_format_pattern(entries, format_pattern)
     else:
         _list_citations(entries, ctx.obj['database'], bibstyle, verbose)
 
@@ -63,6 +69,11 @@ def list_(ctx, search_terms, raw, bibstyle, verbose):
 def _list_raw(entries):
     for entry in entries:
         click.echo(pybibs.write_string([entry]))
+
+
+def _list_format_pattern(entries, format_pattern):
+    for entry in entries:
+        click.echo(internals.format_entry(entry, format_pattern))
 
 
 def _list_citations(entries, database, bibstyle, verbose):

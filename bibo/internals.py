@@ -27,6 +27,33 @@ def header(entry):
     return ' '.join(parts)
 
 
+def format_entry(entry, format_pattern):
+    output = []
+    replacement_start_index = -1
+    for i, char in enumerate(format_pattern):
+        if char == '$':
+            replacement_start_index = i + 1
+        elif (not char.isalpha()) and (replacement_start_index >= 0):
+            field = format_pattern[replacement_start_index:i]
+            output.append(_lookup(entry, field))
+            output.append(char)
+            replacement_start_index = -1
+        elif replacement_start_index == -1:
+            output.append(char)
+    if replacement_start_index >= 0:
+        field = format_pattern[replacement_start_index:]
+        output.append(_lookup(entry, field))
+    return ''.join(output)
+
+
+def _lookup(entry, field):
+    if field in entry:
+        return entry[field]
+    if 'fields' in entry and field in entry['fields']:
+        return entry['fields'][field]
+    return '$' + field
+
+
 def xdg_open(filepath):
     """
     Open with the default system app.

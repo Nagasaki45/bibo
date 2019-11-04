@@ -67,6 +67,13 @@ def test_list_with_no_arguments_to_get_everything(runner, database, data):
         assert entry['key'] in result.output
 
 
+def test_list_with_format_pattern(runner, database):
+    args = ['--database', database, 'list', 'hobbit', '--format', '$year']
+    result = runner.invoke(bibo.cli, args)
+    assert result.exit_code == 0
+    assert result.output.strip() == '1937'
+
+
 def test_open(runner, database):
     with mock.patch('bibo.internals.xdg_open') as xdg_open_mock:
         args = ['--database', database, 'open', 'tolkien1937']

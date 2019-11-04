@@ -38,3 +38,9 @@ def test_set_file_with_destination(data, example_pdf, tmpdir):
 def test_get_database():
     args = ['whatever', '--database', 'test.bib', 'whatever']
     assert internals.get_database(args) == 'test.bib'
+
+
+def test_format_entry(data):
+    entry = data[0]
+    assert internals.format_entry(entry, '$year') == '1937'
+    assert internals.format_entry(entry, '$year: $title') == '1937: The Hobbit'
