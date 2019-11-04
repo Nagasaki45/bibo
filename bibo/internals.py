@@ -22,7 +22,7 @@ def header(entry):
         parts.append(click.style(fields['tags'], fg='cyan'))
     if fields.get('file'):
         parts.append('📁')
-    if fields.get('url'):
+    if fields.get('url') or fields.get('doi'):
         parts.append('🔗')
     return ' '.join(parts)
 
