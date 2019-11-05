@@ -151,10 +151,7 @@ def complete_key(ctx, args, incomplete):
         data = load_database(database)
     else:
         data = []
-    entries = (x for x in data if x['type'] != 'string')
-    keys = (x['key'] for x in entries)
-    escaped = (x.replace(':', r'\\:') for x in keys)
-    return [x for x in escaped if incomplete.lower() in x.lower()]
+    return [x['key'] for x in data if incomplete.lower() in x['key'].lower()]
 
 
 def load_database(database):
