@@ -72,7 +72,7 @@ Setup your database
 =====================
 
 The ``--database`` argument
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When running bibo you should tell it where your ``.bib`` file is. For example, to list the entries in your database, run
 
@@ -84,7 +84,7 @@ If you don't yet have a ``.bib`` file, or want to start working on a new one pas
 
 
 The ``BIBO_DATABASE`` environment variable
-------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Most of the time you will probably use the same ``.bib`` file. So, instead of passing the ``--database`` argument whenever you call bibo you can define the ``BIBO_DATABASE`` environment variable with the path to your ``.bib`` file. From now on, if you don't pass the ``--database`` argument explicitly, bibo will use this predefined database. Note that this is the only bit of configuration bibo uses. Everything else is in your ``.bib`` file!
 
@@ -111,7 +111,7 @@ To read additional information about each command and its arguments run, for exa
 .. _list:
 
 ``list``
---------
+~~~~~~~~
 
 Listing all entries in the database, or filtered with search terms (see bellow). For example
 
@@ -125,7 +125,7 @@ will list all entries with the values 'Albert' and 'Einstein' in any field (or t
 .. _add:
 
 ``add``
--------
+~~~~~~~
 
 To add a new entry to the database, copy the ``bibtex`` citation from, let's say, google scholar, and run
 
@@ -141,7 +141,7 @@ If you want to include a file (a PDF, for example) run the same command with ``-
 .. _open:
 
 ``open``
---------
+~~~~~~~~
 
 Try running
 
@@ -156,7 +156,7 @@ Lets assume that there's a single entry in the database by Albert Einstein (more
 .. _edit:
 
 ``edit``
---------
+~~~~~~~~
 
 The ``edit`` command allows you to edit a single entry by key. You can set a field / key / type by running, for example
 
@@ -174,7 +174,7 @@ The ``edit`` command is also used to link a file to the entry. It is done exactl
 .. _remove:
 
 ``remove``
-----------
+~~~~~~~~~~
 
 The ``remove`` command is used to remove an entry by key, like that
 
