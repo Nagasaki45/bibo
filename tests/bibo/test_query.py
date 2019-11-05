@@ -41,9 +41,8 @@ def test_search_multiple_terms_are_anded(data):
 
 
 def test_search_invalid_search_term(data):
-    with pytest.raises(Exception) as e:
+    with pytest.raises(Exception, match='Invalid search term') as e:
         list(query.search(data, 'a:b:c'))
-    assert 'Invalid search term' in str(e)
 
 
 def test_search_with_capitalized_search_term(data):

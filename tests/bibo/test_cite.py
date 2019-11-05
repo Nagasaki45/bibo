@@ -36,9 +36,8 @@ def test_cite_no_keys(database):
 @mock.patch('subprocess.Popen')
 def test_cite_missing_bibtex(popen_mock, database):
     popen_mock.side_effect = OSError()
-    with pytest.raises(cite.BibtexException) as e:
+    with pytest.raises(cite.BibtexException, match='bibtex is not available') as e:
         cite.cite(['tolkien1937'], database)
-    assert 'not available' in str(e.value)
 
 
 @mock.patch('subprocess.Popen')
@@ -46,6 +45,5 @@ def test_cite_bibtex_issues(popen_mock, database):
     p = mock.Mock()
     p.wait.return_value = 1
     popen_mock.return_value = p
-    with pytest.raises(cite.BibtexException) as e:
+    with pytest.raises(cite.BibtexException, match='bibtex failed') as e:
         cite.cite(['tolkien1937'], database)
-    assert 'bibtex failed' in str(e)
