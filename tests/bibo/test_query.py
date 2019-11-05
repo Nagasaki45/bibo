@@ -3,6 +3,11 @@ import pytest
 from bibo import query
 
 
+def test_search_a_key_with_colon(data):
+    results = list(query.search(data, ['Gurion:']))
+    assert len(results) == 1
+
+
 def test_search_single_term(data):
     results = list(query.search(data, ['asimov']))
     assert len(results) == 1

@@ -26,6 +26,8 @@ def _is_matching(entry, search_term):
     if search_field == 'general':
         return _is_matching_general_field(entry, search_value)
     else:
+        if (search_field + ':' + search_value) in entry['key'].lower():
+            return True
         return _is_matching_specific_field(entry, search_field, search_value)
 
 
