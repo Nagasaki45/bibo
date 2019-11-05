@@ -1,3 +1,4 @@
+import click
 import pytest
 
 from bibo import query
@@ -50,3 +51,9 @@ def test_search_with_capitalized_search_term(data):
     results = list(query.search(data, ['ASIMOV']))
     assert len(results) == 1
     assert results[0]['fields']['title'] == 'Foundation'
+
+
+def test_open_multiple_entries_one_exact_match(data):
+    with pytest.raises(click.ClickException):
+        query.get(data, ['ab'])
+    query.get(data, ['abc'])

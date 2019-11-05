@@ -64,21 +64,18 @@ def _parse_search_term(search_term):
 
 
 def get(data, search_terms):
-    search_results = search(data, search_terms)
+    entries = list(search(data, search_terms))
 
-    try:
-        entry = next(search_results)
-    except StopIteration:
+    for entry in entries:
+        if entry['key'].lower() == search_terms[0].lower():
+            return entry
+
+    if len(entries) == 0:
         raise click.ClickException('No entries found')
-
-    try:
-        next(search_results)
-    except StopIteration:
-        pass
-    else:
+    if len(entries) > 1:
         raise click.ClickException('Multiple entries found')
 
-    return entry
+    return entries[0]
 
 
 def get_by_key(data, key):
