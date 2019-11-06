@@ -75,6 +75,7 @@ setup(
     install_requires=[
         'click',
         'click-plugins',
+        'requests',
         'pyperclip',
     ],
 

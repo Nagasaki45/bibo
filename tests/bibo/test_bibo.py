@@ -6,6 +6,7 @@ except ImportError:
     import mock
 
 import click
+import requests
 
 from bibo import bibo
 import pybibs
@@ -160,6 +161,24 @@ def test_add_without_saving(runner, database):
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 1
     assert 'editor exited' in result.output.lower()
+
+
+def test_add_doi(runner, database):
+
+    class MockResponse():
+        status_code = 200
+        text = '@article{webdoi, title={Just got it from the web}}'
+
+    with mock.patch('requests.get') as get_mock, mock.patch('click.edit') as edit_mock:
+        get_mock.return_value = MockResponse()
+        edit_mock.return_value = get_mock.return_value.text
+        args = ['--database', database, 'add', '--doi', 'my-doi-123']
+        result = runner.invoke(bibo.cli, args)
+        get_mock.assert_called_once()
+    assert result.exit_code == 0
+
+    result = runner.invoke(bibo.cli, ['--database', database, 'list', 'webdoi'])
+    assert 'Just got it from the web' in result.output
 
 
 def test_remove(runner, database):

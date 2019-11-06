@@ -11,6 +11,7 @@ import click
 import click_plugins
 import pybibs
 import pyperclip
+import requests
 
 from . import cite
 from . import internals
@@ -119,13 +120,22 @@ def open_(ctx, search_terms):
 @cli.command(short_help='Add a new entry.')
 @FILE_OPTION
 @DESTINATION_OPTION
+@click.option('--doi', help='Add entry by DOI.')
 @click.pass_context
-def add(ctx, destination, **kwargs):
+def add(ctx, destination, doi, **kwargs):
     file_ = kwargs.pop('file')
     file_validation(file_, destination)
 
     data = ctx.obj['data']
-    bib = internals.editor(text=pyperclip.paste())
+    if doi is not None:
+        url = 'http://dx.doi.org/{}'.format(doi)
+        headers = {'Accept': 'application/x-bibtex'}
+        resp = requests.get(url, headers=headers)
+        assert resp.status_code == 200
+        raw_bib = resp.text
+    else:
+        raw_bib = pyperclip.paste()
+    bib = internals.editor(text=raw_bib)
     entry = pybibs.read_entry_string(bib)
 
     unique_key_validation(entry['key'], data)
