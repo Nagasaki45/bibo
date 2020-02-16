@@ -8,6 +8,7 @@ import pkg_resources
 import sys
 
 import click
+import click_constraints
 import click_plugins
 import pybibs
 import pyperclip
@@ -18,16 +19,32 @@ from . import internals
 from . import query
 
 PATH_OPTION = click.Path(writable=True, readable=True, dir_okay=False)
-FILE_OPTION = click.option(
-    '--file',
-    help='File to link to this entry.',
-    type=click.Path(exists=True, readable=True, dir_okay=False),
-)
-DESTINATION_OPTION = click.option(
-    '--destination',
-    help='A folder to put the file in.',
-    type=click.Path(exists=True, readable=True, dir_okay=True, file_okay=False),
-)
+FILE_OPTIONS = internals.combine_decorators([
+    click.option(
+        '--file',
+        help='File to link to this entry.',
+        type=click.Path(exists=True, readable=True, dir_okay=False),
+    ),
+    click.option(
+        '--destination',
+        help='A folder to put the file in.',
+        type=click.Path(exists=True, readable=True, dir_okay=True, file_okay=False),
+    ),
+    click.option(
+        '--no-copy',
+        help='Add the specified file in its current location without copying.',
+        is_flag=True,
+    ),
+    click_constraints.constrain(
+        'destination',
+        depends=['file']
+    ),
+    click_constraints.constrain(
+        'no_copy',
+        depends=['file'],
+        conflicts=['destination'],
+    ),
+])
 SEARCH_TERMS_OPTION = click.argument(
     'search_terms',
     nargs=-1,
@@ -118,13 +135,11 @@ def open_(ctx, search_terms):
 
 
 @cli.command(short_help='Add a new entry.')
-@FILE_OPTION
-@DESTINATION_OPTION
+@FILE_OPTIONS
 @click.option('--doi', help='Add entry by DOI.')
 @click.pass_context
-def add(ctx, destination, doi, **kwargs):
+def add(ctx, destination, doi, no_copy, **kwargs):
     file_ = kwargs.pop('file')
-    file_validation(file_, destination)
 
     data = ctx.obj['data']
     if doi is not None:
@@ -143,7 +158,7 @@ def add(ctx, destination, doi, **kwargs):
     data.append(entry)
 
     if file_:
-        internals.set_file(data, entry, file_, destination)
+        internals.set_file(data, entry, file_, destination, no_copy)
 
     pybibs.write_file(data, ctx.obj['database'])
 
@@ -173,10 +188,9 @@ def remove(ctx, key, field):
 @cli.command(short_help='Edit an entry.')
 @click.argument('key', autocompletion=internals.complete_key)
 @click.argument('field_value', nargs=-1)
-@FILE_OPTION
-@DESTINATION_OPTION
+@FILE_OPTIONS
 @click.pass_context
-def edit(ctx, key, field_value, destination, **kwargs):
+def edit(ctx, key, field_value, destination, no_copy, **kwargs):
     '''
     FIELD_VALUE
 
@@ -185,7 +199,6 @@ def edit(ctx, key, field_value, destination, **kwargs):
     Set the key / type in the same way.
     '''
     file_ = kwargs.pop('file')
-    file_validation(file_, destination)
 
     data = ctx.obj['data']
     entry = query.get_by_key(data, key)
@@ -194,7 +207,7 @@ def edit(ctx, key, field_value, destination, **kwargs):
         raise click.ClickException('Editing @string entries is unsupported')
 
     if file_:
-        internals.set_file(data, entry, file_, destination)
+        internals.set_file(data, entry, file_, destination, no_copy)
     for fv in field_value:
         if '=' in fv:
             field, value = fv.split('=')
@@ -211,14 +224,6 @@ def edit(ctx, key, field_value, destination, **kwargs):
             entry['fields'][field] = value
 
     pybibs.write_file(data, ctx.obj['database'])
-
-
-def file_validation(file_, destination):
-    if destination and not file_:
-        raise click.BadOptionUsage(
-            'destination',
-            'Specifying destination without a file is meaningless.',
-        )
 
 
 def unique_key_validation(new_key, data):

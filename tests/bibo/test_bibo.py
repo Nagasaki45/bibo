@@ -1,5 +1,6 @@
 import filecmp
 import os
+import pathlib
 try:
     from unittest import mock
 except ImportError:
@@ -152,6 +153,25 @@ def test_add_file_with_destination(runner, database, example_pdf, tmpdir):
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert os.path.isfile(str(destination / 'haidt2001emotional.pdf'))
+
+
+def test_add_file_no_copy(runner, database):
+    # Note that this is the actual test pdf. Not the temp copy!
+    filepath = 'tests/bibo/example.pdf'
+
+    with mock.patch('click.edit') as edit_mock:
+        edit_mock.return_value = TO_ADD
+        args = ['--database', database, 'add', '--file', filepath, '--no-copy']
+        result = runner.invoke(bibo.cli, args)
+
+    with open(database) as f:
+        data = pybibs.read_string(f.read())
+    for item in data:
+        if item['key'] == 'haidt2001emotional':
+            assert item['fields']['file'] == os.path.abspath(filepath)
+            break
+    else:
+        raise AssertionError('Item not found')
 
 
 def test_add_without_saving(runner, database):
