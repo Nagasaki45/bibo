@@ -128,7 +128,7 @@ def open_(ctx, search_terms):
         if value:
             if field_name == 'doi':
                 value = 'https://doi.org/' + value
-            internals.xdg_open(value)
+            click.launch(value)
             break
     else:
         raise click.ClickException('No file / url / doi is associated with this entry')

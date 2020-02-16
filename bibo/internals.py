@@ -5,8 +5,6 @@ import itertools
 import os
 import re
 import shutil
-import subprocess
-import sys
 
 import click
 
@@ -52,19 +50,6 @@ def _lookup(entry, field):
     if 'fields' in entry and field in entry['fields']:
         return entry['fields'][field]
     return '$' + field
-
-
-def xdg_open(filepath):
-    """
-    Open with the default system app.
-    Copied from https://stackoverflow.com/a/435669/1224456
-    """
-    if sys.platform.startswith('darwin'):
-        subprocess.Popen(('open', filepath))
-    elif os.name == 'nt':
-        os.startfile(filepath)
-    elif os.name == 'posix':
-        subprocess.Popen(('xdg-open', filepath))
 
 
 def destination_heuristic(data):
