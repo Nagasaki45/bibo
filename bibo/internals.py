@@ -114,7 +114,11 @@ def string_to_basename(s):
     return re.sub(r'[\s-]+', '-', s)
 
 
-def set_file(data, entry, file_, destination=None):
+def set_file(data, entry, file_, destination=None, no_copy=False):
+    if no_copy:
+        entry['fields']['file'] = os.path.abspath(file_)
+        return
+
     if not destination:
         destination = destination_heuristic(data)
     destination = os.path.abspath(destination)
@@ -163,3 +167,12 @@ def load_database(database):
         return pybibs.read_file(database)
     except IOError:
         return []
+
+
+def combine_decorators(decorators):
+    # Copied from https://stackoverflow.com/a/4122845/1224456
+    def decorator(f):
+        for d in reversed(decorators):
+            f = d(f)
+        return f
+    return decorator
