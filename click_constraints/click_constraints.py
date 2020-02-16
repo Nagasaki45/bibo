@@ -17,13 +17,13 @@ def constrain(constrained, depends=None, conflicts=None):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
             if kwargs.get(constrained):
-                for dependency in depends:
-                    if not kwargs.get(dependency):
-                        msg = f'{constrained} depends on {dependency}'
+                for d in depends:
+                    if not kwargs.get(d):
+                        msg = '{} depends on {}'.format(constrained, d)
                         raise click.BadOptionUsage(constrained, msg)
-                for conflicting in conflicts:
-                    if kwargs.get(conflicting):
-                        msg = f'{constrained} conflicts with {conflicting}'
+                for c in conflicts:
+                    if kwargs.get(c):
+                        msg = '{} conflicts with {}'.format(constrained, c)
                         raise click.BadOptionUsage(constrained, msg)
             return f(*args, **kwargs)
         return wrapper

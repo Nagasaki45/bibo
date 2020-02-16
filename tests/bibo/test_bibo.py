@@ -1,6 +1,5 @@
 import filecmp
 import os
-import pathlib
 try:
     from unittest import mock
 except ImportError:
