@@ -133,7 +133,7 @@ def test_add_with_file(runner, database, example_pdf, tmpdir):
         args = ['--database', database, 'add', '--file', example_pdf]
         result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
-    assert result.output == ''
+    assert result.output.startswith('Copying ')
     expected_pdf = str(tmpdir / 'haidt2001emotional.pdf')
     assert os.path.isfile(expected_pdf)
     assert filecmp.cmp(example_pdf, expected_pdf)
@@ -232,7 +232,7 @@ def test_edit_file(runner, database, example_pdf, tmpdir):
     args = ['--database', database, 'edit', 'asimov1951foundation', '--file', example_pdf]
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
-    assert result.output == ''
+    assert result.output.startswith('Copying ')
 
     with open(database) as f:
         assert 'asimov1951foundation.pdf' in f.read()

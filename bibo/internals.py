@@ -122,6 +122,7 @@ def set_file(data, entry, file_, destination=None):
     basename = string_to_basename(entry['key'])
     path = os.path.join(destination, basename + file_extension)
     entry['fields']['file'] = path
+    click.echo('Copying {} to {}'.format(file_, path))
     shutil.copy(file_, path)
 
 
