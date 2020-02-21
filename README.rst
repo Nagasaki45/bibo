@@ -37,14 +37,14 @@ Prerequisites
 
 .. code-block:: bash
 
-    pip install bibo
+    pip3 install bibo
 
 
 On linux / mac you might need to prepend the above command with ``sudo`` for system wide installation, or, preferably, use the ``--user`` flag like this:
 
 .. code-block:: bash
 
-    pip install --user bibo
+    pip3 install --user bibo
 
 
 For more information see the `official packages installation guide`_.
