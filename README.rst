@@ -7,9 +7,10 @@ Bibo
 .. image:: https://codecov.io/gh/Nagasaki45/bibo/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/Nagasaki45/bibo
 
-
 A reference manager with a single source of truth: the ``.bib`` file. Inspired by `beets`_.
 
+.. image:: https://asciinema.org/a/CWnbJ9XiJq4LEsqqureiXQSpi.svg
+  :target: https://asciinema.org/a/CWnbJ9XiJq4LEsqqureiXQSpi
 
 Why?
 ----
