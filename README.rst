@@ -9,8 +9,8 @@ Bibo
 
 A reference manager with a single source of truth: the ``.bib`` file. Inspired by `beets`_.
 
-.. image:: https://asciinema.org/a/CWnbJ9XiJq4LEsqqureiXQSpi.svg
-  :target: https://asciinema.org/a/CWnbJ9XiJq4LEsqqureiXQSpi
+.. image:: https://asciinema.org/a/313768.svg
+  :target: https://asciinema.org/a/313768
 
 Why?
 ----
