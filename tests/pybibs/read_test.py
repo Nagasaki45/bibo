@@ -16,7 +16,7 @@ def test_read_string(raw):
 def test_read_file(database):
     bib = pybibs.read_file(database)
     for entry in bib:
-        if entry['key'] == 'bailenson2005digital':
+        if entry.get('key') == 'bailenson2005digital':
             break
     else:
         raise AssertionError('Couldn\'t find bailenson2005digital in parsed data')
@@ -49,3 +49,15 @@ def test_string_type_entry():
     assert bib[0]['type'] == 'string'
     assert bib[0]['key'] == 'foo'
     assert bib[0]['val'] == 'Mrs. Foo'
+
+
+def test_comment_type_entry():
+    raw = '@comment{This is a comment}'
+    bib = pybibs.read_string(raw)
+    assert bib[0] == {'type': 'comment', 'body': 'This is a comment'}
+
+
+def test_preamble_type_entry():
+    raw = r'@preamble{"Some \latex code"}'
+    bib = pybibs.read_string(raw)
+    assert bib[0] == {'type': 'preamble', 'body': r'"Some \latex code"'}

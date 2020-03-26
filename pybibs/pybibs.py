@@ -37,6 +37,11 @@ def read_entry_string(raw_entry):
             'key': k,
             'val': v,
         }
+    elif type_ in ['comment', 'preamble']:
+        return {
+            'type': type_,
+            'body': rest,
+        }
 
     entry = {'fields': OrderedDict()}
     key, inner = rest.split(',', 1)

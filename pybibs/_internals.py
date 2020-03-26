@@ -98,12 +98,18 @@ def parse_value(value):
 def write_entry(entry):
     if entry['type'] == 'string':
         return write_string_entry(entry)
+    elif entry['type'] in ['comment', 'preamble']:
+        return write_key_body_entry(entry)
     else:
         return write_general_entry(entry)
 
 
 def write_string_entry(entry):
     return '@string{{{} = "{}"}}'.format(entry['key'], entry['val'])
+
+
+def write_key_body_entry(entry):
+    return '@{type}{{{body}}}'.format_map(entry)
 
 
 def write_general_entry(entry):
