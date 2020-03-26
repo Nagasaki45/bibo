@@ -2,12 +2,14 @@ import itertools
 
 import click
 
+from . import internals
+
 
 def search(data, search_terms):
     if isinstance(search_terms, str):
         search_terms = [search_terms]
     search_terms = iter(search_terms)
-    return _recursive_search(data, search_terms)
+    return _recursive_search(internals.bib_entries(data), search_terms)
 
 
 def _recursive_search(data, search_terms):
@@ -79,7 +81,7 @@ def get(data, search_terms):
 
 
 def get_by_key(data, key):
-    for entry in data:
+    for entry in internals.bib_entries(data):
         if entry['key'] == key:
             return entry
     raise click.ClickException('Couldn\'t find"{}"'.format(key))

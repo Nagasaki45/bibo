@@ -12,7 +12,7 @@ def test_destination_heuristic(data, tmpdir):
 
 def test_destination_heuristic_empty(data):
     for entry in data:
-        if 'file' in entry['fields']:
+        if 'file' in entry.get('fields', []):
             del entry['fields']['file']
     with pytest.raises(click.ClickException, match='.*no paths in the database') as e:
         internals.destination_heuristic(data)
@@ -20,7 +20,8 @@ def test_destination_heuristic_empty(data):
 
 def test_destination_heuristic_multiple_equaly_valid_paths(data):
     for i, entry in enumerate(data):
-        entry['fields']['file'] = '/fake/path{}/file'.format(i)
+        if 'fields' in entry:
+            entry['fields']['file'] = '/fake/path{}/file'.format(i)
     with pytest.raises(click.ClickException, match='.*there are multiple equally valid paths in the database') as e:
         internals.destination_heuristic(data)
 

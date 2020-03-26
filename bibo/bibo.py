@@ -153,7 +153,7 @@ def add(ctx, destination, doi, no_copy, **kwargs):
     bib = internals.editor(text=raw_bib)
     entry = pybibs.read_entry_string(bib)
 
-    unique_key_validation(entry['key'], data)
+    internals.unique_key_validation(entry['key'], data)
 
     data.append(entry)
 
@@ -203,9 +203,6 @@ def edit(ctx, key, field_value, destination, no_copy, **kwargs):
     data = ctx.obj['data']
     entry = query.get_by_key(data, key)
 
-    if entry['type'] == 'string':
-        raise click.ClickException('Editing @string entries is unsupported')
-
     if file_:
         internals.set_file(data, entry, file_, destination, no_copy)
     for fv in field_value:
@@ -216,7 +213,7 @@ def edit(ctx, key, field_value, destination, no_copy, **kwargs):
             current_value = entry['fields'].get(field, '')
             value = internals.editor(text=current_value).strip()
         if field == 'key':
-            unique_key_validation(value, data)
+            internals.unique_key_validation(value, data)
             entry['key'] = value
         elif field == 'type':
             entry['type'] = value
@@ -224,11 +221,6 @@ def edit(ctx, key, field_value, destination, no_copy, **kwargs):
             entry['fields'][field] = value
 
     pybibs.write_file(data, ctx.obj['database'])
-
-
-def unique_key_validation(new_key, data):
-    if new_key in (e['key'] for e in data):
-        raise click.ClickException('Duplicate key, command aborted')
 
 
 if __name__ == '__main__':

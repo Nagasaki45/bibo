@@ -58,7 +58,7 @@ def destination_heuristic(data):
     vote.
     """
     counter = collections.Counter()
-    for entry in data:
+    for entry in bib_entries(data):
         file_field = entry['fields'].get('file')
         if not file_field:
             continue
@@ -141,6 +141,7 @@ def complete_key(ctx, args, incomplete):
         data = load_database(database)
     else:
         data = []
+    data = bib_entries(data)
     return [x['key'] for x in data if incomplete.lower() in x['key'].lower()]
 
 
@@ -161,3 +162,18 @@ def combine_decorators(decorators):
             f = d(f)
         return f
     return decorator
+
+
+def bib_entries(entries):
+    '''
+    Yield only the actual bibliographic items from a list of entries.
+    Drop @string / @comment / @preamble entries.
+    '''
+    for e in entries:
+        if e['type'] not in ['string', 'comment', 'preamble']:
+            yield e
+
+
+def unique_key_validation(new_key, data):
+    if new_key in (e['key'] for e in bib_entries(data)):
+        raise click.ClickException('Duplicate key, command aborted')

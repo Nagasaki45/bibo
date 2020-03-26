@@ -65,7 +65,8 @@ def test_list_with_no_arguments_to_get_everything(runner, database, data):
     args = ['--database', database, 'list']
     result = runner.invoke(bibo.cli, args)
     for entry in data:
-        assert entry['key'] in result.output
+        if entry['type'] not in ['string', 'comment', 'preamble']:
+            assert entry['key'] in result.output
 
 
 def test_list_with_format_pattern(runner, database):
@@ -73,6 +74,13 @@ def test_list_with_format_pattern(runner, database):
     result = runner.invoke(bibo.cli, args)
     assert result.exit_code == 0
     assert result.output.strip() == '1937'
+
+
+def test_list_shows_only_bib_entries(runner, database):
+    args = ['--database', database, 'list']
+    result = runner.invoke(bibo.cli, args)
+    for non_bib_type in ['string', 'comment', 'preamble']:
+        assert non_bib_type not in result.output
 
 
 def test_open(runner, database):
@@ -166,7 +174,7 @@ def test_add_file_no_copy(runner, database):
     with open(database) as f:
         data = pybibs.read_string(f.read())
     for item in data:
-        if item['key'] == 'haidt2001emotional':
+        if item.get('key') == 'haidt2001emotional':
             assert item['fields']['file'] == os.path.abspath(filepath)
             break
     else:
