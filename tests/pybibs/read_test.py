@@ -43,7 +43,7 @@ def test_read_bens_multiline(bens_multiline_entry):
     assert fields['year'] == '2019'
 
 
-def test_string_command():
+def test_string_type_entry():
     raw = '@string{foo = "Mrs. Foo"}'
     bib = pybibs.read_string(raw)
     assert bib[0]['type'] == 'string'
