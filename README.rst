@@ -1,4 +1,4 @@
-Bibo
+bibo
 ####
 
 .. image:: https://travis-ci.org/Nagasaki45/bibo.svg?branch=master
@@ -7,7 +7,7 @@ Bibo
 .. image:: https://codecov.io/gh/Nagasaki45/bibo/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/Nagasaki45/bibo
 
-A reference manager with a single source of truth: the ``.bib`` file. Inspired by `beets`_.
+Command line reference manager with a single source of truth: the ``.bib`` file. Inspired by `beets`_.
 
 .. image:: https://asciinema.org/a/313768.svg
   :target: https://asciinema.org/a/313768
@@ -15,7 +15,7 @@ A reference manager with a single source of truth: the ``.bib`` file. Inspired b
 Why?
 ----
 
-There are many reference managers out there, so why writing another one? Bibo is different for a few reasons:
+There are many reference managers out there, so why writing another one? bibo is different for a few reasons:
 
 1. It relies solely on your ``.bib`` file to track information. This is bibo's main selling point! Your ``.bib`` file and your other files (PDFs, for example) are exactly where you want them to be. You have full control over your data.
 2. Being a command line tool, integration with other command line applications is easy and powerful.
@@ -134,7 +134,7 @@ To add a new entry to the database, copy the ``bibtex`` citation from, let's say
 
     bibo add
 
-Bibo will open your editor and paste the clipboard content to it. You are free to edit this content and save it to add the entry to the database.
+bibo will open your editor and paste the clipboard content to it. You are free to edit this content and save it to add the entry to the database.
 
 If you want to include a file (a PDF, for example) run the same command with ``--file /path/to/file`` at the end. After saving the bibtex citation in the editor bibo will search through the already existing paths in your database, find the most commonly used one, and copy the file you specified to there, renaming it to the bibtex key. If you don't want this automatic destination heuristic you can specify the destination yourself by adding ``--destination /path/to/folder/``.
 
