@@ -218,5 +218,17 @@ If you're on zsh add this to your ``.zshrc``
 Now, while in the middle of a command, press <TAB> to auto-complete options, arguments, or keys from your ``.bib`` database.
 
 
+Plugins by the community
+------------------------
+
+bibo is extensible with plugins. Here are some examples by the community:
+
+- `bibo-todo <https://github.com/Kappers/bibo-todo>`_: Plugin for bibo, mark entry as todo with optional note.
+- `bibo-mark-read <https://github.com/Nagasaki45/bibo-mark-read>`_: A bibo plugin to mark that an entry was read.
+- `bibo-check <https://github.com/Nagasaki45/bibo-check>`_: A bibo plugin to check for mess in your files.
+
+Send a pull request to add your bibo plugins to the list.
+
+
 .. _beets: https://github.com/beetbox/beets
 .. _`official packages installation guide`: https://packaging.python.org/tutorials/installing-packages/
