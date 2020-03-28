@@ -51,6 +51,24 @@ On linux / mac you might need to prepend the above command with ``sudo`` for sys
 For more information see the `official packages installation guide`_.
 
 
+Auto-complete
+=============
+
+To activate auto-complete, if you're using Bash add the following to your ``.bashrc``
+
+.. code-block:: bash
+
+    eval "$(_BIBO_COMPLETE=source bibo)"
+
+If you're on zsh add this to your ``.zshrc``
+
+.. code-block:: bash
+
+    eval "$(_BIBO_COMPLETE=source_zsh bibo)"
+
+Now, while in the middle of a command, press <TAB> to auto-complete options, arguments, or keys from your ``.bib`` database.
+
+
 Quick start guide
 -----------------
 
@@ -64,7 +82,6 @@ Quick start guide
   - remove_
 
 - Queries_
-- Auto-complete_
 
 
 .. _`Setup your database`:
@@ -196,26 +213,6 @@ Queries
 =======
 
 Most of bibo's commands expect you to provide search terms. Some of them, like the ``open`` command, will only work if the search terms matches a single entry in the database. A single search term matches an entry if it appears in the type, key, or any of the fields of the entry. If multiple search terms are provided an entry should match all of them. Note that search terms are case insensitive. In addition, it is possible to match against a specific field with, for example ``author:einstein`` or ``year:2018``. You can match against type / key in a similar fashion, with, let's say ``type:book``.
-
-
-.. _Auto-complete:
-
-Auto-complete
-=============
-
-To activate auto-complete, if you're using Bash add the following to your ``.bashrc``
-
-.. code-block:: bash
-
-    eval "$(_BIBO_COMPLETE=source bibo)"
-
-If you're on zsh add this to your ``.zshrc``
-
-.. code-block:: bash
-
-    eval "$(_BIBO_COMPLETE=source_zsh bibo)"
-
-Now, while in the middle of a command, press <TAB> to auto-complete options, arguments, or keys from your ``.bib`` database.
 
 
 Plugins by the community
