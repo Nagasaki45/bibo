@@ -188,7 +188,6 @@ def complete_path(ctx, args, incomplete):
     wildc_path = os.path.expanduser(os.path.expandvars(incomplete)) + '*'
     options = []
     for path in glob.glob(wildc_path):
-        if not os.access(path, os.R_OK):
-            continue
-        options.append((path, os.path.basename(path)))
+        if os.access(path, os.R_OK):
+            options.append((path, os.path.basename(path)))
     return options
