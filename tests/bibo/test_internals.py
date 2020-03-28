@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import click
 import pytest  # type: ignore
@@ -68,6 +69,19 @@ def test_set_file_with_destination(example_pdf, tmpdir):
     internals.set_file(data, entry, example_pdf, str(destination))
     assert os.path.exists(str(destination / entry["key"] + ".pdf"))
 
+def test_set_file_exists_already(data, example_pdf, tmpdir):
+    entry = data[0]
+    # Create an existing pdf, specified by user as relative path
+    ext = os.path.splitext(example_pdf)[1]
+    dest = tmpdir / 'subdir'
+    os.mkdir(dest.strpath)
+    existing_pdf = shutil.copyfile(example_pdf, dest.join(entry['key'] + ext))
+    relative_file = os.path.join('subdir', os.path.basename(existing_pdf))
+    with tmpdir.as_cwd():
+        try:
+            internals.set_file(data, entry, relative_file, dest.strpath)
+        except shutil.SameFileError as e:
+            pytest.fail('Raised {}'.format(repr(e)))
 
 def test_get_database():
     args = ["whatever", "--database", "test.bib", "whatever"]

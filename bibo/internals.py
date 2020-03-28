@@ -118,8 +118,9 @@ def set_file(data, entry, file_, destination=None, no_copy=False):
     basename = string_to_basename(entry["key"])
     path = os.path.join(destination, basename + file_extension)
     entry["fields"]["file"] = path
-    click.echo("Copying {} to {}".format(file_, path))
-    shutil.copy(file_, path)
+    if not os.path.isfile(path):
+        click.echo("Copying {} to {}".format(file_, path))
+        shutil.copy(file_, path)
 
 
 def editor(*args, **kwargs):
