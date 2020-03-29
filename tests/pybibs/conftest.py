@@ -55,24 +55,22 @@ archivePrefix = "arXiv",
 def parsed():
     return [
         {
-            'key': 'israel',
-            'type': 'article',
-            'fields':
-            OrderedDict([
-                ('author', 'Israel, Moshe'),
-                ('title', 'Article title'),
-                ('year', '2008'),
-            ]),
+            "key": "israel",
+            "type": "article",
+            "fields": OrderedDict(
+                [
+                    ("author", "Israel, Moshe"),
+                    ("title", "Article title"),
+                    ("year", "2008"),
+                ]
+            ),
         },
         {
-            'key': 'orwell',
-            'type': 'book',
-            'fields':
-            OrderedDict([
-                ('author', 'Orwell, George'),
-                ('title', '1984'),
-                ('year', '1949'),
-            ]),
+            "key": "orwell",
+            "type": "book",
+            "fields": OrderedDict(
+                [("author", "Orwell, George"), ("title", "1984"), ("year", "1949"),]
+            ),
         },
     ]
 
@@ -88,4 +86,4 @@ year = 2008
 
 @pytest.fixture
 def database():
-    return 'tests/pybibs/data/huge.bib'
+    return "tests/pybibs/data/huge.bib"
