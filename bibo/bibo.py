@@ -24,11 +24,13 @@ FILE_OPTIONS = internals.combine_decorators([
         '--file',
         help='File to link to this entry.',
         type=click.Path(exists=True, readable=True, dir_okay=False),
+        autocompletion=internals.complete_path,
     ),
     click.option(
         '--destination',
         help='A folder to put the file in.',
         type=click.Path(exists=True, readable=True, dir_okay=True, file_okay=False),
+        autocompletion=internals.complete_path,
     ),
     click.option(
         '--no-copy',
@@ -56,7 +58,8 @@ SEARCH_TERMS_OPTION = click.argument(
 @click.group(help=__doc__)
 @click.version_option()
 @click.option('--database', envvar=internals.BIBO_DATABASE_ENV_VAR,
-              help='A .bib file.', required=True, type=PATH_OPTION)
+              help='A .bib file.', required=True, type=PATH_OPTION,
+              autocompletion=internals.complete_path)
 @click.pass_context
 def cli(ctx, database):
     ctx.ensure_object(dict)
