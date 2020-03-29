@@ -7,6 +7,10 @@ bibo
 .. image:: https://codecov.io/gh/Nagasaki45/bibo/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/Nagasaki45/bibo
 
+.. image:: https://readthedocs.org/projects/bibo/badge/?version=latest
+  :target: https://bibo.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
+
 Command line reference manager with a single source of truth: the ``.bib`` file. Inspired by `beets`_.
 
 .. image:: https://asciinema.org/a/313768.svg
