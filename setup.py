@@ -71,9 +71,9 @@ setup(
         "dev": [
             "black",
             "bumpversion",
-            "pytest",
             "coverage",
             "codecov",
+            "pytest",
         ],
     },
     # To provide executable scripts, use entry points in preference to the
