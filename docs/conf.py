@@ -22,7 +22,7 @@ copyright = "2020, Tom Gurion"
 author = "Tom Gurion"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.25"
+release = "0.0.26"
 
 
 # -- General configuration ---------------------------------------------------
