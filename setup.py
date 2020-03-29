@@ -74,7 +74,6 @@ setup(
             "pytest",
             "coverage",
             "codecov",
-            'mock;python_version<"3.3"',
         ],
     },
     # To provide executable scripts, use entry points in preference to the
