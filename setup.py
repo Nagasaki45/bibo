@@ -74,6 +74,8 @@ setup(
             "coverage",
             "codecov",
             "pytest",
+            "sphinx",
+            "sphinx-click",
         ],
     },
     # To provide executable scripts, use entry points in preference to the
