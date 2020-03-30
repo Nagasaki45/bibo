@@ -70,6 +70,8 @@ Use ``#XXX`` to reference the issue or ``Fix: #XXX`` if issue fixed by the commi
 
 Pull requests should be based on the ``dev`` branch.
 
+Feel free to add yourself to the CONTRIBUTORS file 😊
+
 
 Plugins development
 -------------------
