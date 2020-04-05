@@ -1,5 +1,7 @@
-bibo
-####
+.. image:: https://raw.githubusercontent.com/Nagasaki45/bibo/master/logo/logo.svg
+    :alt: bibo logo
+
+Command line reference manager with a single source of truth: the ``.bib`` file. Inspired by `beets`_.
 
 .. image:: https://travis-ci.org/Nagasaki45/bibo.svg?branch=master
     :target: https://travis-ci.org/Nagasaki45/bibo
@@ -10,8 +12,6 @@ bibo
 .. image:: https://readthedocs.org/projects/bibo/badge/?version=latest
   :target: https://bibo.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
-
-Command line reference manager with a single source of truth: the ``.bib`` file. Inspired by `beets`_.
 
 .. image:: https://asciinema.org/a/313768.svg
   :target: https://asciinema.org/a/313768
