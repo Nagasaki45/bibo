@@ -105,7 +105,8 @@ def list_(ctx, search_term, raw, bibstyle, verbose, **kwargs):
     format_pattern = kwargs.pop("format")
     assert not kwargs
 
-    entries = query.search(ctx.obj["data"], search_term)
+    results = query.search(ctx.obj["data"], search_term)
+    entries = (r.entry for r in results)
     if raw:
         _list_raw(entries)
     elif format_pattern:
@@ -171,7 +172,7 @@ def open_(ctx, search_term):
     This command fails if the number of entries that match the search is
     different than one.
     """
-    entry = query.get(ctx.obj["data"], search_term)
+    entry = query.get(ctx.obj["data"], search_term).entry
 
     for field_name in ["file", "url", "doi"]:
         value = entry.get("fields", {}).get(field_name)

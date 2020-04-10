@@ -192,3 +192,15 @@ def complete_path(ctx, args, incomplete):
         if os.access(path, os.R_OK):
             options.append((path, os.path.basename(path)))
     return options
+
+
+def match_case(substring, target):
+    """
+    Return the string `substring` with the same case as in the `target`
+    string.
+    """
+    index = target.lower().find(substring.lower())
+    if index < 0:
+        msg = "Failed to match case: {} not in {}".format(substring, target)
+        raise ValueError(msg)
+    return target[index : (index + len(substring))]

@@ -1,3 +1,5 @@
+import collections
+import collections.abc
 import itertools
 
 import click
@@ -5,77 +7,93 @@ import click
 from . import internals
 
 
+SearchResult = collections.namedtuple("SearchResult", ["entry", "match"])
+
+
 def search(data, search_terms):
     if isinstance(search_terms, str):
         search_terms = [search_terms]
     search_terms = iter(search_terms)
-    return _recursive_search(internals.bib_entries(data), search_terms)
+    results = (SearchResult(e, {}) for e in internals.bib_entries(data))
+    return _recursive_search(results, search_terms)
 
 
-def _recursive_search(data, search_terms):
+def _recursive_search(results, search_terms):
     try:
         search_term = next(search_terms)
-        return _recursive_search(
-            (e for e in data if _is_matching(e, search_term)), search_terms,
-        )
+        # Calculate match with search term and update results
+        results = (_update_result(r, _match(r.entry, search_term)) for r in results)
+        # Drop Nones with empty match
+        results = (r for r in results if r)
+        return _recursive_search(results, search_terms)
     except StopIteration:
-        return data
+        return results
 
 
-def _is_matching(entry, search_term):
+def _match(entry, search_term):
+    """
+    Return a similar structure to an entry (nested dict) with matching strings
+    as values.
+    """
+    if search_term.lower() in entry["key"].lower():
+        return {"key": internals.match_case(search_term, entry["key"])}
+
     search_field, search_value = _parse_search_term(search_term)
-    if search_field == "general":
-        return _is_matching_general_field(entry, search_value)
-    else:
-        if (search_field + ":" + search_value) in entry["key"].lower():
-            return True
-        return _is_matching_specific_field(entry, search_field, search_value)
 
-
-def _is_matching_general_field(entry, search_value):
-    searchables = itertools.chain(
-        entry.get("fields", {}).values(), (entry[x] for x in ["key", "type"]),
-    )
-
-    for searchable in searchables:
-        if search_value in searchable.lower():
-            return True
-    return False
-
-
-def _is_matching_specific_field(entry, search_field, search_value):
-    if search_field == "key":
-        return search_value in entry["key"].lower()
-    if search_field == "type":
-        return search_value in entry["type"].lower()
+    d = collections.defaultdict(dict)
+    for part in ["key", "type"]:
+        if search_field and search_field != part:
+            continue
+        if search_value in entry[part].lower():
+            d[part] = internals.match_case(search_value, entry[part])
     for field, value in entry.get("fields", {}).items():
-        if search_field == field.lower():
-            return search_value in value.lower()
-    return False
+        if search_field and search_field != field:
+            continue
+        if search_value in value.lower():
+            d["fields"][field] = internals.match_case(search_value, value)
+    return d
+
+
+def _update_result(result, new_match):
+    if not new_match:
+        return None
+    d = _nested_append(result.match, new_match)
+    return SearchResult(result.entry, d)
+
+
+def _nested_append(d, u):
+    _d = d.copy()
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
+            _d[k] = _nested_append(d.get(k, {}), v)
+        else:
+            _d[k] = _d.get(k, [])
+            _d[k].append(v)
+    return _d
 
 
 def _parse_search_term(search_term):
     parts = search_term.split(":")
     if len(parts) == 1:
-        return "general", parts[0].lower()
+        return None, parts[0].lower()
     if len(parts) == 2:
         return parts[0].lower(), parts[1].lower()
     raise click.ClickException("Invalid search term")
 
 
 def get(data, search_terms):
-    entries = list(search(data, search_terms))
+    results = list(search(data, search_terms))
 
-    for entry in entries:
-        if entry["key"].lower() == search_terms[0].lower():
-            return entry
+    for result in results:
+        if result.entry["key"].lower() == search_terms[0].lower():
+            return result
 
-    if len(entries) == 0:
+    if len(results) == 0:
         raise click.ClickException("No entries found")
-    if len(entries) > 1:
+    if len(results) > 1:
         raise click.ClickException("Multiple entries found")
 
-    return entries[0]
+    return results[0]
 
 
 def get_by_key(data, key):

@@ -74,3 +74,10 @@ def test_complete_path(tmpdir):
     assert len(ms_subdir) == 1
     # Check for completion help string as basename
     assert ms_subdir[0] == (subp.strpath, subp.basename)
+
+
+def test_match_case():
+    assert internals.match_case("hello", "Hello World") == "Hello"
+    assert internals.match_case("WORLD", "Hello World") == "World"
+    with pytest.raises(ValueError):
+        internals.match_case("bibo", "Hello World")

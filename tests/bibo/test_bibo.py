@@ -328,7 +328,7 @@ def test_edit_multiple_fields(runner, database):
 
     with open(database) as f:
         data = pybibs.read_string(f.read())
-        entry = bibo.query.get(data, "asimov")
+        entry = bibo.query.get(data, "asimov").entry
         assert entry["fields"]["title"] == "I, robot"
         assert entry["fields"]["year"] == "1950"
 
