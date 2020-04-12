@@ -3,7 +3,7 @@ import os
 import click
 import pytest  # type: ignore
 
-from bibo import internals
+from bibo import internals, models
 
 
 def test_destination_heuristic(data, tmpdir):
@@ -81,3 +81,36 @@ def test_match_case():
     assert internals.match_case("WORLD", "Hello World") == "World"
     with pytest.raises(ValueError):
         internals.match_case("bibo", "Hello World")
+
+
+def test_highlight_text():
+    s1 = "hello world"
+    s2 = "hello {}w{}orld".format(internals._ansi_bold, internals._ansi_unbold)
+    assert internals.highlight_text(s1, "w") == s2
+
+    s3 = "hell{}o w{}orld".format(internals._ansi_bold, internals._ansi_unbold)
+    assert internals.highlight_text(s2, "o ") == s3
+
+
+def test_highlight_text_with_color():
+    s1 = "hello world"
+    s2 = "hello {}w{}orld".format(internals._ansi_bold, internals._ansi_unbold)
+    f = lambda s: click.style(s, fg="green")
+    assert internals.highlight_text(f(s1), "w") == f(s2)
+
+
+def test_highlight_match():
+    text = "my name is Moshe, 40"
+    entry = {"name": "Moshe", "fields": {"age": "40", "address": "London, UK",}}
+    match = {"name": ["Mosh"], "fields": {"address": ["London"],}}
+    result = models.SearchResult(entry, match)
+
+    text, extra_match_info = internals.highlight_match(text, result)
+    assert text == "my name is {}Mosh{}e, 40".format(
+        internals._ansi_bold, internals._ansi_unbold
+    )
+    assert extra_match_info == {
+        "address": "{}London{}, UK".format(
+            internals._ansi_bold, internals._ansi_unbold
+        ),
+    }

@@ -106,13 +106,12 @@ def list_(ctx, search_term, raw, bibstyle, verbose, **kwargs):
     assert not kwargs
 
     results = query.search(ctx.obj["data"], search_term)
-    entries = (r.entry for r in results)
     if raw:
-        _list_raw(entries)
+        _list_raw((r.entry for r in results))
     elif format_pattern:
-        _list_format_pattern(entries, format_pattern)
+        _list_format_pattern((r.entry for r in results), format_pattern)
     else:
-        _list_citations(entries, ctx.obj["database"], bibstyle, verbose)
+        _list_citations(results, ctx.obj["database"], bibstyle, verbose)
 
 
 def _list_raw(entries):
@@ -125,21 +124,31 @@ def _list_format_pattern(entries, format_pattern):
         click.echo(internals.format_entry(entry, format_pattern))
 
 
-def _list_citations(entries, database, bibstyle, verbose):
-    entries = [e for e in entries if e["type"] != "string"]
-    keys = [e["key"] for e in entries]
+def _list_citations(results, database, bibstyle, verbose):
+    results = list(results)
+    keys = [r.entry["key"] for r in results]
     exception = None
     try:
         citations = cite.cite(keys, database, bibstyle, verbose)
     except cite.BibtexException as e:
         exception = e
 
-    for entry in entries:
-        parts = [
-            internals.header(entry),
-            cite.fallback(entry) if exception else citations[entry["key"]],
-        ]
-        click.echo("\n".join(parts))
+    for result in results:
+        header = internals.header(result.entry)
+        if exception:
+            citation = cite.fallback(result.entry)
+        else:
+            citation = citations[result.entry["key"]]
+
+        text = "\n".join([header, citation])
+        text, extra_match_info = internals.highlight_match(text, result)
+
+        click.echo(text)
+
+        if extra_match_info:
+            click.secho("Search matched by", underline=True)
+        for key, val in extra_match_info.items():
+            click.echo("{}: {}".format(key, val))
 
     if exception is not None:
         parts = [str(exception), "Using a fallback citation method"]

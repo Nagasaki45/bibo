@@ -1,7 +1,7 @@
 import click
 import pytest  # type: ignore
 
-from bibo import query
+from bibo import models, query
 
 
 def test_search_a_key_with_colon(data):
@@ -82,7 +82,7 @@ def test_update_result():
         "a": "1234",
         "props": {"b": "ABCD"},
     }
-    r1 = query.SearchResult(entry, {})
+    r1 = models.SearchResult(entry, {})
     assert query._update_result(r1, {}) == None
 
     r2 = query._update_result(r1, {"a": "1"})

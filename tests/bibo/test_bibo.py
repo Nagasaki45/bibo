@@ -80,6 +80,13 @@ def test_list_shows_only_bib_entries(runner, database):
         assert non_bib_type not in result.output
 
 
+def test_list_extra_match_info(runner, database):
+    args = ["--database", database, "list", "lotr.com"]
+    result = runner.invoke(bibo.cli, args)
+    assert "matched by" in result.output
+    assert "url: " in result.output
+
+
 def test_open(runner, database):
     with mock.patch("click.launch") as launch_mock:
         args = ["--database", database, "open", "tolkien1937"]

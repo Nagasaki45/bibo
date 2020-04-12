@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import collections
+import collections.abc
 import glob
 import itertools
 import os
@@ -10,6 +11,8 @@ import shutil
 import click
 
 import pybibs
+
+from . import models
 
 BIBO_DATABASE_ENV_VAR = "BIBO_DATABASE"
 
@@ -204,3 +207,38 @@ def match_case(substring, target):
         msg = "Failed to match case: {} not in {}".format(substring, target)
         raise ValueError(msg)
     return target[index : (index + len(substring))]
+
+
+_ansi_bold = "\033[1m"
+_ansi_unbold = "\033[22m"
+
+
+def highlight_text(text, highlight):
+    """
+    Return `text` with sub-string `highlight` in bold.
+    """
+    text = re.sub(
+        highlight, "{}{}{}".format(_ansi_bold, highlight, _ansi_unbold), text,
+    )
+    # Drop ANSI unbold followed by ANSI bold
+    return text.replace(_ansi_unbold + _ansi_bold, "")
+
+
+def highlight_match(text, result, extra_match_info=None):
+    if extra_match_info is None:
+        extra_match_info = {}
+    for key, vals in result.match.items():
+        if isinstance(vals, collections.abc.Mapping):
+            inner_result = models.SearchResult(result.entry[key], result.match[key],)
+            text, extra_match_info = highlight_match(
+                text, inner_result, extra_match_info,
+            )
+        else:
+            for val in vals:
+                if val in text:
+                    text = highlight_text(text, val)
+                else:
+                    extra_match_val = extra_match_info.get(key, result.entry[key])
+                    extra_match_val = highlight_text(extra_match_val, val)
+                    extra_match_info[key] = extra_match_val
+    return text, extra_match_info

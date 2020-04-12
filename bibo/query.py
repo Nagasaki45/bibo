@@ -4,17 +4,14 @@ import itertools
 
 import click
 
-from . import internals
-
-
-SearchResult = collections.namedtuple("SearchResult", ["entry", "match"])
+from . import internals, models
 
 
 def search(data, search_terms):
     if isinstance(search_terms, str):
         search_terms = [search_terms]
     search_terms = iter(search_terms)
-    results = (SearchResult(e, {}) for e in internals.bib_entries(data))
+    results = (models.SearchResult(e, {}) for e in internals.bib_entries(data))
     return _recursive_search(results, search_terms)
 
 
@@ -58,7 +55,7 @@ def _update_result(result, new_match):
     if not new_match:
         return None
     d = _nested_append(result.match, new_match)
-    return SearchResult(result.entry, d)
+    return models.SearchResult(result.entry, d)
 
 
 def _nested_append(d, u):
