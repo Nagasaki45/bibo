@@ -224,7 +224,14 @@ def highlight_text(text, highlight):
     return text.replace(_ansi_unbold + _ansi_bold, "")
 
 
-def highlight_match(text, result, extra_match_info=None):
+def highlight_match(
+    text: str, result: models.SearchResult, extra_match_info: dict = None
+):
+    """
+    Highlight `text` with `result.match` info. Every bit of info that is in
+    `result.match` but not in `text` is added to the `extra_match_info` to
+    present to the user.
+    """
     if extra_match_info is None:
         extra_match_info = {}
     for key, vals in result.match.items():
