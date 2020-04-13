@@ -67,7 +67,10 @@ def test_search_match_details(data):
 
 def test_match(data):
     entry = data[0]
-    assert query._match(entry, "Tolkien") == {"key": "tolkien"}
+    assert query._match(entry, "Tolkien") == {
+        "key": "tolkien",
+        "fields": {"author": "Tolkien"},
+    }
     assert query._match(entry, "article") == {}
     assert query._match(entry, "book") == {"type": "book"}
     assert query._match(entry, "hobbit") == {

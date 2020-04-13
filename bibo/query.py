@@ -32,12 +32,14 @@ def _match(entry, search_term):
     Return a similar structure to an entry (nested dict) with matching strings
     as values.
     """
+    d = collections.defaultdict(dict)
+
+    # For cases where the entire search term is a key (e.g. best:author)
     if search_term.lower() in entry["key"].lower():
-        return {"key": internals.match_case(search_term, entry["key"])}
+        d["key"] = internals.match_case(search_term, entry["key"])
 
     search_field, search_value = _parse_search_term(search_term)
 
-    d = collections.defaultdict(dict)
     for part in ["key", "type"]:
         if search_field and search_field != part:
             continue
