@@ -1,5 +1,5 @@
 import click
-import pytest
+import pytest  # type: ignore
 
 from bibo import query
 

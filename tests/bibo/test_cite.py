@@ -1,10 +1,7 @@
-import click
-import pytest
+from unittest import mock
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+import click
+import pytest  # type: ignore
 
 from bibo import cite
 

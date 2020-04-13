@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-import pytest
+import pytest  # type: ignore
 
 
 @pytest.fixture()

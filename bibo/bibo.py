@@ -9,9 +9,9 @@ import sys
 
 import click
 import click_constraints
-import click_plugins
+import click_plugins  # type: ignore
 import pybibs
-import pyperclip
+import pyperclip  # type: ignore
 import requests
 
 from . import cite

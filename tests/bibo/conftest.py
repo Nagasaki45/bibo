@@ -1,7 +1,7 @@
 import shutil
 
 import click.testing
-import pytest
+import pytest  # type: ignore
 
 import pybibs
 

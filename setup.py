@@ -1,5 +1,5 @@
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages  # type: ignore
 
 # To use a consistent encoding
 from codecs import open
@@ -73,8 +73,10 @@ setup(
             "bumpversion",
             "coverage",
             "codecov",
+            "mypy",
             "pytest",
             "pytest-black",
+            "pytest-mypy",
             "sphinx",
             "sphinx-click",
         ],
