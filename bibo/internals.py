@@ -15,6 +15,8 @@ import pybibs
 from . import models
 
 BIBO_DATABASE_ENV_VAR = "BIBO_DATABASE"
+_ANSI_BOLD = "\033[1m"
+_ANSI_UNBOLD = "\033[22m"
 
 
 def header(entry):
@@ -209,19 +211,15 @@ def match_case(substring, target):
     return target[index : (index + len(substring))]
 
 
-_ansi_bold = "\033[1m"
-_ansi_unbold = "\033[22m"
-
-
 def highlight_text(text, highlight):
     """
     Return `text` with sub-string `highlight` in bold.
     """
     text = re.sub(
-        highlight, "{}{}{}".format(_ansi_bold, highlight, _ansi_unbold), text,
+        highlight, "{}{}{}".format(_ANSI_BOLD, highlight, _ANSI_UNBOLD), text,
     )
     # Drop ANSI unbold followed by ANSI bold
-    return text.replace(_ansi_unbold + _ansi_bold, "")
+    return text.replace(_ANSI_UNBOLD + _ANSI_BOLD, "")
 
 
 def highlight_match(

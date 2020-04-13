@@ -85,16 +85,16 @@ def test_match_case():
 
 def test_highlight_text():
     s1 = "hello world"
-    s2 = "hello {}w{}orld".format(internals._ansi_bold, internals._ansi_unbold)
+    s2 = "hello {}w{}orld".format(internals._ANSI_BOLD, internals._ANSI_UNBOLD)
     assert internals.highlight_text(s1, "w") == s2
 
-    s3 = "hell{}o w{}orld".format(internals._ansi_bold, internals._ansi_unbold)
+    s3 = "hell{}o w{}orld".format(internals._ANSI_BOLD, internals._ANSI_UNBOLD)
     assert internals.highlight_text(s2, "o ") == s3
 
 
 def test_highlight_text_with_color():
     s1 = "hello world"
-    s2 = "hello {}w{}orld".format(internals._ansi_bold, internals._ansi_unbold)
+    s2 = "hello {}w{}orld".format(internals._ANSI_BOLD, internals._ANSI_UNBOLD)
     f = lambda s: click.style(s, fg="green")
     assert internals.highlight_text(f(s1), "w") == f(s2)
 
@@ -107,10 +107,10 @@ def test_highlight_match():
 
     text, extra_match_info = internals.highlight_match(text, result)
     assert text == "my name is {}Mosh{}e, 40".format(
-        internals._ansi_bold, internals._ansi_unbold
+        internals._ANSI_BOLD, internals._ANSI_UNBOLD
     )
     assert extra_match_info == {
         "address": "{}London{}, UK".format(
-            internals._ansi_bold, internals._ansi_unbold
+            internals._ANSI_BOLD, internals._ANSI_UNBOLD
         ),
     }
