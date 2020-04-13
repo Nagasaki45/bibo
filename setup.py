@@ -74,6 +74,7 @@ setup(
             "coverage",
             "codecov",
             "pytest",
+            "pytest-black",
             "sphinx",
             "sphinx-click",
         ],

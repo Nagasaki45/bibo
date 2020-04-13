@@ -21,7 +21,6 @@ services:
 install:
 - pip install .[dev]
 script:
-- black . --check
 - coverage run -m pytest
 after_success:
 - codecov

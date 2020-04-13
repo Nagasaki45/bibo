@@ -20,14 +20,7 @@ Running tests
 
     pytest
 
-
-Formatting the code
--------------------
-
-.. code-block:: bash
-
-    black .  # To format the code
-    black . --check  # To check if the code is formatted correctly
+It automatically checks code formatting with `black <https://github.com/psf/black>`_. If code formatting errors are detected they can be manually fixed, or try running ``black .``.
 
 
 Generating the documentation
