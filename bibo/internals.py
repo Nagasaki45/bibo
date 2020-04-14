@@ -200,13 +200,16 @@ def complete_path(ctx, args, incomplete):
     return options
 
 
+def bold(s: str) -> str:
+    """Return `s` wrapped in ANSI bold."""
+    return "{}{}{}".format(_ANSI_BOLD, s, _ANSI_UNBOLD)
+
+
 def highlight_text(text, highlight):
     """
     Return `text` with sub-string `highlight` in bold.
     """
-    text = re.sub(
-        highlight, "{}{}{}".format(_ANSI_BOLD, highlight, _ANSI_UNBOLD), text,
-    )
+    text = re.sub(highlight, bold(highlight), text)
     # Drop ANSI unbold followed by ANSI bold
     return text.replace(_ANSI_UNBOLD + _ANSI_BOLD, "")
 

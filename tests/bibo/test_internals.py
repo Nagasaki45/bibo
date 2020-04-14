@@ -78,16 +78,16 @@ def test_complete_path(tmpdir):
 
 def test_highlight_text():
     s1 = "hello world"
-    s2 = "hello {}w{}orld".format(internals._ANSI_BOLD, internals._ANSI_UNBOLD)
+    s2 = "hello {}orld".format(internals.bold("w"))
     assert internals.highlight_text(s1, "w") == s2
 
-    s3 = "hell{}o w{}orld".format(internals._ANSI_BOLD, internals._ANSI_UNBOLD)
+    s3 = "hell{}orld".format(internals.bold("o w"))
     assert internals.highlight_text(s2, "o ") == s3
 
 
 def test_highlight_text_with_color():
     s1 = "hello world"
-    s2 = "hello {}w{}orld".format(internals._ANSI_BOLD, internals._ANSI_UNBOLD)
+    s2 = "hello {}orld".format(internals.bold("w"))
     f = lambda s: click.style(s, fg="green")
     assert internals.highlight_text(f(s1), "w") == f(s2)
 
@@ -99,11 +99,5 @@ def test_highlight_match():
     result = models.SearchResult(entry, match)
 
     text, extra_match_info = internals.highlight_match(text, result)
-    assert text == "my name is {}Mosh{}e, 40".format(
-        internals._ANSI_BOLD, internals._ANSI_UNBOLD
-    )
-    assert extra_match_info == {
-        "address": "{}London{}, UK".format(
-            internals._ANSI_BOLD, internals._ANSI_UNBOLD
-        ),
-    }
+    assert text == "my name is {}e, 40".format(internals.bold("Mosh"))
+    assert extra_match_info == {"address": "{}, UK".format(internals.bold("London"))}
