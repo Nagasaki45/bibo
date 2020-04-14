@@ -1,17 +1,23 @@
 # coding=utf-8
 
 import collections
+import collections.abc
 import glob
 import itertools
 import os
 import re
 import shutil
+import typing
 
 import click
 
 import pybibs
 
+from . import models
+
 BIBO_DATABASE_ENV_VAR = "BIBO_DATABASE"
+_ANSI_BOLD = "\033[1m"
+_ANSI_UNBOLD = "\033[22m"
 
 
 def header(entry):
@@ -192,3 +198,44 @@ def complete_path(ctx, args, incomplete):
         if os.access(path, os.R_OK):
             options.append((path, os.path.basename(path)))
     return options
+
+
+def bold(s: str) -> str:
+    """Return `s` wrapped in ANSI bold."""
+    return "{}{}{}".format(_ANSI_BOLD, s, _ANSI_UNBOLD)
+
+
+def highlight_text(text, highlight):
+    """
+    Return `text` with sub-string `highlight` in bold.
+    """
+    text = re.sub(highlight, bold(highlight), text)
+    # Drop ANSI unbold followed by ANSI bold
+    return text.replace(_ANSI_UNBOLD + _ANSI_BOLD, "")
+
+
+def highlight_match(
+    text: str, result: models.SearchResult, extra_match_info: dict = None
+) -> typing.Tuple[str, dict]:
+    """
+    Highlight `text` with `result.match` info. Every bit of info that is in
+    `result.match` but not in `text` is added to the `extra_match_info` to
+    present to the user.
+    """
+    if extra_match_info is None:
+        extra_match_info = {}
+    for key, vals in result.match.items():
+        if isinstance(vals, collections.abc.Mapping):
+            inner_result = models.SearchResult(result.entry[key], result.match[key],)
+            text, extra_match_info = highlight_match(
+                text, inner_result, extra_match_info,
+            )
+        else:
+            for val in vals:
+                if val in text:
+                    text = highlight_text(text, val)
+                else:
+                    extra_match_val = extra_match_info.get(key, result.entry[key])
+                    extra_match_val = highlight_text(extra_match_val, val)
+                    extra_match_info[key] = extra_match_val
+    return text, extra_match_info

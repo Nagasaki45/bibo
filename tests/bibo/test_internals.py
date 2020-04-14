@@ -3,7 +3,7 @@ import os
 import click
 import pytest  # type: ignore
 
-from bibo import internals
+from bibo import internals, models
 
 
 def test_destination_heuristic(data, tmpdir):
@@ -74,3 +74,30 @@ def test_complete_path(tmpdir):
     assert len(ms_subdir) == 1
     # Check for completion help string as basename
     assert ms_subdir[0] == (subp.strpath, subp.basename)
+
+
+def test_highlight_text():
+    s1 = "hello world"
+    s2 = "hello {}orld".format(internals.bold("w"))
+    assert internals.highlight_text(s1, "w") == s2
+
+    s3 = "hell{}orld".format(internals.bold("o w"))
+    assert internals.highlight_text(s2, "o ") == s3
+
+
+def test_highlight_text_with_color():
+    s1 = "hello world"
+    s2 = "hello {}orld".format(internals.bold("w"))
+    f = lambda s: click.style(s, fg="green")
+    assert internals.highlight_text(f(s1), "w") == f(s2)
+
+
+def test_highlight_match():
+    text = "my name is Moshe, 40"
+    entry = {"name": "Moshe", "fields": {"age": "40", "address": "London, UK",}}
+    match = {"name": ["Mosh"], "fields": {"address": ["London"],}}
+    result = models.SearchResult(entry, match)
+
+    text, extra_match_info = internals.highlight_match(text, result)
+    assert text == "my name is {}e, 40".format(internals.bold("Mosh"))
+    assert extra_match_info == {"address": "{}, UK".format(internals.bold("London"))}
