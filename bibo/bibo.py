@@ -23,7 +23,7 @@ FILE_OPTIONS = internals.combine_decorators(
     [
         click.option(
             "--file",
-            help="File to link to this entry.",
+            help="Path to file to link to this entry.",
             type=click.Path(exists=True, readable=True, dir_okay=False),
             autocompletion=internals.complete_path,
         ),
@@ -45,7 +45,7 @@ FILE_OPTIONS = internals.combine_decorators(
     ]
 )
 SEARCH_TERMS_OPTION = click.argument(
-    "search_terms", nargs=-1, autocompletion=internals.complete_key,
+    "search_term", nargs=-1, autocompletion=internals.complete_key,
 )
 
 
@@ -55,7 +55,9 @@ SEARCH_TERMS_OPTION = click.argument(
 @click.option(
     "--database",
     envvar=internals.BIBO_DATABASE_ENV_VAR,
-    help="A .bib file.",
+    help="""
+A path to a .bib file. Overrides the BIBO_DATABASE environment variable.
+""",
     required=True,
     type=PATH_OPTION,
     autocompletion=internals.complete_path,
@@ -68,17 +70,42 @@ def cli(ctx, database):
 
 
 @cli.command("list", short_help="List entries.")
-@click.option("--raw", is_flag=True, help="Format as raw .bib entries")
-@click.option("--bibstyle", default="plain", help="Citation format")
-@click.option("--verbose", is_flag=True, help="Print verbose information")
-@click.option("--format", help="Format pattern")
+@click.option("--raw", is_flag=True, help="Format as raw .bib entries.")
+@click.option(
+    "--bibstyle",
+    default="plain",
+    help="""
+Bibtex bibliography style to use for citation formatting.
+For more information check https://www.overleaf.com/learn/latex/Bibtex_bibliography_styles.
+""",
+)
+@click.option(
+    "--format",
+    help="""
+Custom format pattern.
+Use ``$`` in front of a key, type, or field to create custom formatter.
+For example: ``--format '$author ($year) - $title'``.
+""",
+)
+@click.option("--verbose", is_flag=True, help="Show verbose information.")
 @SEARCH_TERMS_OPTION
 @click.pass_context
-def list_(ctx, search_terms, raw, bibstyle, verbose, **kwargs):
+def list_(ctx, search_term, raw, bibstyle, verbose, **kwargs):
+    """
+    List entries in the database.
+
+    A SEARCH_TERM matches an entry if it appears in the type, key, or any
+    of the fields of the entry.
+    If multiple search terms are provided an entry should match all of them.
+    It is possible to match against a specific key, type, or field as
+    follows: ``author:einstein``, ``year:2018`` or ``type:book``.
+    Note that search terms are case insensitive.
+    """
+
     format_pattern = kwargs.pop("format")
     assert not kwargs
 
-    entries = query.search(ctx.obj["data"], search_terms)
+    entries = query.search(ctx.obj["data"], search_term)
     if raw:
         _list_raw(entries)
     elif format_pattern:
@@ -120,11 +147,31 @@ def _list_citations(entries, database, bibstyle, verbose):
         click.secho(". ".join(parts), fg="red")
 
 
-@cli.command("open", short_help="Open the file / url / doi associated with an entry.")
+@cli.command("open", short_help="Open the file, URL, or doi associated with an entry.")
 @SEARCH_TERMS_OPTION
 @click.pass_context
-def open_(ctx, search_terms):
-    entry = query.get(ctx.obj["data"], search_terms)
+def open_(ctx, search_term):
+    """
+    Open an entry in the database if a ``file``, ``url``, or ``doi`` field
+    exists (with precedence in this order).
+
+    A file will be open by the application defined by your system according
+    to the file extension.
+    For example, a PDF should be opened by a PDF reader and a folder should
+    be opened by a file browser.
+    URLs and DOIs should be opened in the web browser
+
+    A SEARCH_TERM matches an entry if it appears in the type, key, or any
+    of the fields of the entry.
+    If multiple search terms are provided an entry should match all of them.
+    It is possible to match against a specific key, type, or field as
+    follows: ``author:einstein``, ``year:2018`` or ``type:book``.
+    Note that search terms are case insensitive.
+
+    This command fails if the number of entries that match the search is
+    different than one.
+    """
+    entry = query.get(ctx.obj["data"], search_term)
 
     for field_name in ["file", "url", "doi"]:
         value = entry.get("fields", {}).get(field_name)
@@ -134,7 +181,7 @@ def open_(ctx, search_terms):
             click.launch(value)
             break
     else:
-        raise click.ClickException("No file / url / doi is associated with this entry")
+        raise click.ClickException("No file, url, or doi is associated with this entry")
 
 
 @cli.command(short_help="Add a new entry.")
@@ -142,6 +189,17 @@ def open_(ctx, search_terms):
 @click.option("--doi", help="Add entry by DOI.")
 @click.pass_context
 def add(ctx, destination, doi, no_copy, **kwargs):
+    """
+    Add a new entry to the database.
+
+    Find a bib entry you would like to add.
+    Copy it to the clipboard, and run the command.
+    It will be opened in your editor for validation or manual editing.
+    Upon saving, the entry is added to the database.
+
+    Don't forget to set the EDITOR environment variable for this command
+    to work properly.
+    """
     file_ = kwargs.pop("file")
 
     data = ctx.obj["data"]
@@ -171,6 +229,12 @@ def add(ctx, destination, doi, no_copy, **kwargs):
 @click.argument("field", nargs=-1)
 @click.pass_context
 def remove(ctx, key, field):
+    """
+    Remove an entry from the database or remove a field from an entry.
+
+    To remove an entry specify its key.
+    To fields specify the key and list all fields for removal.
+    """
     data = ctx.obj["data"]
     entry = query.get_by_key(data, key)
 
@@ -195,11 +259,15 @@ def remove(ctx, key, field):
 @click.pass_context
 def edit(ctx, key, field_value, destination, no_copy, **kwargs):
     """
-    FIELD_VALUE
+    Edit an entry.
 
-    To set fields: author=Einstein tags=interesting.
+    Use FIELD_VALUE to set fields as follows: ``author=Einstein``, or
+    ``tags=interesting``.
     Leave the value empty to open in editor.
-    Set the key / type in the same way.
+    Set the key or type in the same way.
+
+    Don't forget to set the EDITOR environment variable for this command
+    to work properly.
     """
     file_ = kwargs.pop("file")
 
