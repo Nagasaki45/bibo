@@ -7,6 +7,7 @@ import itertools
 import os
 import re
 import shutil
+import typing
 
 import click
 
@@ -224,7 +225,7 @@ def highlight_text(text, highlight):
 
 def highlight_match(
     text: str, result: models.SearchResult, extra_match_info: dict = None
-):
+) -> typing.Tuple[str, dict]:
     """
     Highlight `text` with `result.match` info. Every bit of info that is in
     `result.match` but not in `text` is added to the `extra_match_info` to
