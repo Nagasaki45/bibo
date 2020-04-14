@@ -62,22 +62,22 @@ def test_search_match_details(data):
     results = list(query.search(data, ["tolkien", "hobbit"]))
     assert len(results) == 1
     assert "tolkien" in results[0].match["key"]
-    assert ("title", ["Hobbit"]) in results[0].match["fields"].items()
+    assert ("title", set(["Hobbit"])) in results[0].match["fields"].items()
 
 
 def test_match(data):
     entry = data[0]
     assert query._match(entry, "Tolkien") == {
-        "key": "tolkien",
-        "fields": {"author": "Tolkien"},
+        "key": {"tolkien"},
+        "fields": {"author": set(["Tolkien"])},
     }
     assert query._match(entry, "article") == {}
-    assert query._match(entry, "book") == {"type": "book"}
+    assert query._match(entry, "book") == {"type": set(["book"])}
     assert query._match(entry, "hobbit") == {
-        "fields": {"title": "Hobbit", "file": "hobbit"}
+        "fields": {"title": set(["Hobbit"]), "file": set(["hobbit"])},
     }
-    assert query._match(entry, "year:193") == {"fields": {"year": "193"}}
-    assert query._match(entry, "year:1937") == {"fields": {"year": "1937"}}
+    assert query._match(entry, "year:193") == {"fields": {"year": set(["193"])}}
+    assert query._match(entry, "year:1937") == {"fields": {"year": set(["1937"])}}
 
 
 def test_update_result():
@@ -88,22 +88,22 @@ def test_update_result():
     r1 = models.SearchResult(entry, {})
     assert query._update_result(r1, {}) == None
 
-    r2 = query._update_result(r1, {"a": "1"})
+    r2 = query._update_result(r1, {"a": set(["1"])})
     assert "a" in r2.match
-    assert r2.match["a"] == ["1"]
+    assert r2.match["a"] == set(["1"])
 
-    r3 = query._update_result(r2, {"props": {"b": "ABC"}})
-    assert r3.match["props"]["b"] == ["ABC"]
+    r3 = query._update_result(r2, {"props": {"b": set(["ABC"])}})
+    assert r3.match["props"]["b"] == set(["ABC"])
 
-    r4 = query._update_result(r3, {"props": {"b": "D"}})
-    assert r3.match["props"]["b"] == ["ABC", "D"]
+    r4 = query._update_result(r3, {"props": {"b": set(["D"])}})
+    assert r4.match["props"]["b"] == {"ABC", "D"}
 
 
-def test_nested_append():
-    d = {"x": {"y": ["z"]}}
-    u = {"x": {"y": "t"}}
-    assert query._nested_append(d, u) == {"x": {"y": ["z", "t"]}}
+def test_nested_update():
+    d = {"x": {"y": set("z")}}
+    u = {"x": {"y": set("t")}}
+    assert query._nested_update(d, u) == {"x": {"y": {"z", "t"}}}
 
     d = {}
-    u = {"x": "X"}
-    assert query._nested_append(d, u) == {"x": ["X"]}
+    u = {"x": set("X")}
+    assert query._nested_update(d, u) == {"x": set("X")}

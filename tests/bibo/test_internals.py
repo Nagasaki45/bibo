@@ -76,13 +76,6 @@ def test_complete_path(tmpdir):
     assert ms_subdir[0] == (subp.strpath, subp.basename)
 
 
-def test_match_case():
-    assert internals.match_case("hello", "Hello World") == "Hello"
-    assert internals.match_case("WORLD", "Hello World") == "World"
-    with pytest.raises(ValueError):
-        internals.match_case("bibo", "Hello World")
-
-
 def test_highlight_text():
     s1 = "hello world"
     s2 = "hello {}w{}orld".format(internals._ANSI_BOLD, internals._ANSI_UNBOLD)

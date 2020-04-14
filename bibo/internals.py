@@ -200,18 +200,6 @@ def complete_path(ctx, args, incomplete):
     return options
 
 
-def match_case(substring, target):
-    """
-    Return the string `substring` with the same case as in the `target`
-    string.
-    """
-    index = target.lower().find(substring.lower())
-    if index < 0:
-        msg = "Failed to match case: {} not in {}".format(substring, target)
-        raise ValueError(msg)
-    return target[index : (index + len(substring))]
-
-
 def highlight_text(text, highlight):
     """
     Return `text` with sub-string `highlight` in bold.
