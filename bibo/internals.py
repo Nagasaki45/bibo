@@ -210,7 +210,7 @@ def highlight_text(text, highlight):
     Return `text` with sub-string `highlight` in bold.
     """
 
-    def highlighter(s: re.Match) -> str:
+    def highlighter(s):
         return bold(s.group(0))
 
     text = re.sub(highlight, highlighter, text, flags=re.IGNORECASE)
