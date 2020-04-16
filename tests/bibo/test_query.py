@@ -79,6 +79,10 @@ def test_match(data):
     assert query._match(entry, "year:193") == {"fields": {"year": set(["193"])}}
     assert query._match(entry, "year:1937") == {"fields": {"year": set(["1937"])}}
 
+    # Issue 68: A match with field only, no key should return empty set,
+    # not a set with empty string. It breaks the highlighting
+    assert query._match(entry, "year:") == {"fields": {"year": set()}}
+
 
 def test_update_result():
     entry = {

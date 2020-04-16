@@ -34,28 +34,47 @@ def _match(entry, search_term: str):
     Return a similar structure to an entry (nested dict) with matching strings
     as values.
     """
+    # The match to populate
     d: typing.Dict[str, typing.Any] = {}
 
     # For cases where the entire search term is a key (e.g. best:author)
-    matches = re.findall(search_term, entry["key"], re.IGNORECASE)
-    if matches:
-        d.setdefault("key", set()).update(matches)
+    _match_field("key", entry["key"], search_term, lambda: d)
 
     search_field, search_value = _parse_search_term(search_term)
 
-    for part in ["key", "type"]:
-        if search_field and search_field != part:
-            continue
-        matches = re.findall(search_value, entry[part], re.IGNORECASE)
-        if matches:
-            d.setdefault(part, set()).update(matches)
-    for field, value in entry.get("fields", {}).items():
-        if search_field and search_field != field:
-            continue
-        matches = re.findall(search_value, value, re.IGNORECASE)
-        if matches:
-            d.setdefault("fields", {}).setdefault(field, set()).update(matches)
+    if search_field in ["key", "type"]:
+        _match_field(search_field, entry[search_field], search_value, lambda: d)
+    elif search_field in entry["fields"]:
+        if search_value:
+            _match_field(
+                search_field,
+                entry["fields"][search_field],
+                search_value,
+                lambda: d.setdefault("fields", {}),
+            )
+        # Allow query by field with no value (e.g. bibo list readdate:)
+        else:
+            d.setdefault("fields", {}).setdefault(search_field, set())
+    else:
+        for part in ["key", "type"]:
+            _match_field(part, entry[part], search_value, lambda: d)
+        for field, value in entry.get("fields", {}).items():
+            _match_field(field, value, search_value, lambda: d.setdefault("fields", {}))
     return d
+
+
+def _match_field(
+    field: str, value: str, search_value: str, get_dict: typing.Callable[[], dict],
+) -> None:
+    """
+    Try to match a field/value to a search_value. If there are
+    matches, `get_dict` is called to get the dictionary to put the results
+    in, usually the `match`, or `match["fields"]`.
+    """
+    matches = set(re.findall(search_value, value, re.IGNORECASE))
+    matches.discard("")
+    if matches:
+        get_dict().setdefault(field, set()).update(matches)
 
 
 def _update_result(result, new_match):
@@ -76,7 +95,7 @@ def _nested_update(d, u):
     return _d
 
 
-def _parse_search_term(search_term):
+def _parse_search_term(search_term: str):
     parts = search_term.split(":")
     if len(parts) == 1:
         return None, parts[0].lower()
