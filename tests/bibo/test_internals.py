@@ -101,3 +101,15 @@ def test_highlight_match():
     text, extra_match_info = internals.highlight_match(text, result)
     assert text == "my name is {}e, 40".format(internals.bold("Mosh"))
     assert extra_match_info == {"address": "{}, UK".format(internals.bold("London"))}
+
+
+def test_highlight_match_case_insensitive():
+    # Testing issue #69
+    text = "Turn-taking"
+    entry = {"fields": {"title": "Turn-Taking"}}
+    match = {"fields": {"title": set(["Turn-Taking"])}}
+    result = models.SearchResult(entry, match)
+
+    text, extra_match_info = internals.highlight_match(text, result)
+    assert text == internals.bold("Turn-taking")
+    assert extra_match_info == {}

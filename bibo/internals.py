@@ -209,7 +209,11 @@ def highlight_text(text, highlight):
     """
     Return `text` with sub-string `highlight` in bold.
     """
-    text = re.sub(highlight, bold(highlight), text)
+
+    def highlighter(s: re.Match) -> str:
+        return bold(s.group(0))
+
+    text = re.sub(highlight, highlighter, text, flags=re.IGNORECASE)
     # Drop ANSI unbold followed by ANSI bold
     return text.replace(_ANSI_UNBOLD + _ANSI_BOLD, "")
 
@@ -232,7 +236,7 @@ def highlight_match(
             )
         else:
             for val in vals:
-                if val in text:
+                if val.lower() in text.lower():
                     text = highlight_text(text, val)
                 else:
                     extra_match_val = extra_match_info.get(key, result.entry[key])
