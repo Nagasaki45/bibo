@@ -37,7 +37,7 @@ def read_entry_string(raw_entry):
             "key": k,
             "val": v,
         }
-    elif type_ in ["comment", "preamble"]:
+    elif type_.lower() in ["comment", "preamble"]:
         return {
             "type": type_,
             "body": rest,

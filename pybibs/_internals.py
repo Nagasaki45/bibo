@@ -98,7 +98,7 @@ def parse_value(value):
 def write_entry(entry):
     if entry["type"] == "string":
         return write_string_entry(entry)
-    elif entry["type"] in ["comment", "preamble"]:
+    elif entry["type"].lower() in ["comment", "preamble"]:
         return write_key_body_entry(entry)
     else:
         return write_general_entry(entry)
