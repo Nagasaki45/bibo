@@ -178,7 +178,7 @@ def bib_entries(entries):
     Drop @string / @comment / @preamble entries.
     """
     for e in entries:
-        if e["type"] not in ["string", "comment", "preamble"]:
+        if e["type"].lower() not in ["string", "comment", "preamble"]:
             yield e
 
 

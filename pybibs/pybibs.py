@@ -30,14 +30,14 @@ def read_entry_string(raw_entry):
     assert rest[-1] == "}"
     rest = rest[:-1]
 
-    if type_ == "string":
+    if type_.lower() == "string":
         k, v = next(_internals.parse_raw_key_values(rest))
         return {
             "type": "string",
             "key": k,
             "val": v,
         }
-    elif type_ in ["comment", "preamble"]:
+    elif type_.lower() in ["comment", "preamble"]:
         return {
             "type": type_,
             "body": rest,
