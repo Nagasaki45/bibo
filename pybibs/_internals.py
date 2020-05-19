@@ -117,5 +117,5 @@ def write_general_entry(entry):
     parts += ["@", entry["type"], "{", entry["key"]]
     for k, v in entry["fields"].items():
         parts += [",\n", "  ", k, " = {", v, "}"]
-    parts.append("\n}")
+    parts.append(",\n}")
     return "".join(parts)

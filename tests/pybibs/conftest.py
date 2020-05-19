@@ -9,13 +9,13 @@ def raw():
 @article{israel,
   author = {Israel, Moshe},
   title = {Article title},
-  year = {2008}
+  year = {2008},
 }
 
 @book{orwell,
   author = {Orwell, George},
   title = {1984},
-  year = {1949}
+  year = {1949},
 }
 """.strip()
 
