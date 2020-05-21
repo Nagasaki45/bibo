@@ -13,7 +13,7 @@ with open(path.join(here, "README.rst"), encoding="utf-8") as f:
 
 setup(
     name="bibo",
-    version="0.0.31",
+    version="0.0.32",
     description="Command line reference manager with single source of truth: the .bib file. Inspired by beets",
     long_description=long_description,
     url="https://github.com/Nagasaki45/bibo",
