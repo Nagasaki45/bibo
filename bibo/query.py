@@ -101,7 +101,7 @@ def _parse_search_term(search_term: str):
         return None, parts[0].lower()
     if len(parts) == 2:
         return parts[0].lower(), parts[1].lower()
-    raise click.ClickException("Invalid search term")
+    return "key", search_term.lower()
 
 
 def get(data, search_terms):

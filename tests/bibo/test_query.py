@@ -40,16 +40,20 @@ def test_search_multiple_terms_are_anded(data):
     assert results[0].entry["fields"]["title"] == "The Hobbit"
 
 
-def test_search_invalid_search_term(data):
-    with pytest.raises(Exception, match="Invalid search term") as e:
-        list(query.search(data, "a:b:c"))
-
-
 def test_search_with_capitalized_search_term(data):
     """Issue #28"""
     results = list(query.search(data, ["ASIMOV"]))
     assert len(results) == 1
     assert results[0].entry["fields"]["title"] == "Foundation"
+
+
+def test_search_or_get_key_with_many_colons(data):
+    """Issue #66"""
+    results = list(query.search(data, "key:with:many:colons"))
+    assert len(results) == 1
+
+    search_result = query.get(data, "key:with:many:colons")
+    assert search_result.entry["fields"]["title"] == "Key with many colons"
 
 
 def test_open_multiple_entries_one_exact_match(data):
