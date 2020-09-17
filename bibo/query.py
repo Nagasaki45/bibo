@@ -64,7 +64,10 @@ def _match(entry, search_term: str):
 
 
 def _match_field(
-    field: str, value: str, search_value: str, get_dict: typing.Callable[[], dict],
+    field: str,
+    value: str,
+    search_value: str,
+    get_dict: typing.Callable[[], dict],
 ) -> None:
     """
     Try to match a field/value to a search_value. If there are

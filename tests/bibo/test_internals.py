@@ -135,8 +135,19 @@ def test_highlight_text_with_color():
 
 def test_highlight_match():
     text = "my name is Moshe, 40"
-    entry = {"name": "Moshe", "fields": {"age": "40", "address": "London, UK",}}
-    match = {"name": ["Mosh"], "fields": {"address": ["London"],}}
+    entry = {
+        "name": "Moshe",
+        "fields": {
+            "age": "40",
+            "address": "London, UK",
+        },
+    }
+    match = {
+        "name": ["Mosh"],
+        "fields": {
+            "address": ["London"],
+        },
+    }
     result = models.SearchResult(entry, match)
 
     text, extra_match_info = internals.highlight_match(text, result)

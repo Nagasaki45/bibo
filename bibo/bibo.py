@@ -40,12 +40,16 @@ FILE_OPTIONS = internals.combine_decorators(
         ),
         click_constraints.constrain("destination", depends=["file"]),
         click_constraints.constrain(
-            "no_copy", depends=["file"], conflicts=["destination"],
+            "no_copy",
+            depends=["file"],
+            conflicts=["destination"],
         ),
     ]
 )
 SEARCH_TERMS_OPTION = click.argument(
-    "search_term", nargs=-1, autocompletion=internals.complete_key,
+    "search_term",
+    nargs=-1,
+    autocompletion=internals.complete_key,
 )
 
 

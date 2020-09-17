@@ -66,7 +66,12 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=["click", "click-plugins", "requests", "pyperclip",],
+    install_requires=[
+        "click",
+        "click-plugins",
+        "requests",
+        "pyperclip",
+    ],
     extras_require={
         "dev": [
             "black",
@@ -88,5 +93,9 @@ setup(
     #
     # For example, the following would provide a command called `sample` which
     # executes the function `main` from this package when invoked:
-    entry_points={"console_scripts": ["bibo=bibo.bibo:cli",],},
+    entry_points={
+        "console_scripts": [
+            "bibo=bibo.bibo:cli",
+        ],
+    },
 )

@@ -230,9 +230,14 @@ def highlight_match(
         extra_match_info = {}
     for key, vals in result.match.items():
         if isinstance(vals, collections.abc.Mapping):
-            inner_result = models.SearchResult(result.entry[key], result.match[key],)
+            inner_result = models.SearchResult(
+                result.entry[key],
+                result.match[key],
+            )
             text, extra_match_info = highlight_match(
-                text, inner_result, extra_match_info,
+                text,
+                inner_result,
+                extra_match_info,
             )
         else:
             for val in vals:

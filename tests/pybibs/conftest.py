@@ -69,7 +69,11 @@ def parsed():
             "key": "orwell",
             "type": "book",
             "fields": OrderedDict(
-                [("author", "Orwell, George"), ("title", "1984"), ("year", "1949"),]
+                [
+                    ("author", "Orwell, George"),
+                    ("title", "1984"),
+                    ("year", "1949"),
+                ]
             ),
         },
     ]
