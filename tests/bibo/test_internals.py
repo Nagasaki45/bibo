@@ -4,32 +4,64 @@ import click
 import pytest  # type: ignore
 
 from bibo import internals, models
+import pybibs
 
 
-def test_destination_heuristic(data, tmpdir):
-    assert internals.destination_heuristic(data) == tmpdir
+def test_destination_heuristic(tmpdir):
+    data = pybibs.read_string(
+        """
+        @article{a,
+            file = {~/some/path/a.pdf},
+        }
+
+        @article{b,
+            file = {~/some/path/b.pdf},
+        }
+        """
+    )
+    assert internals.destination_heuristic(data) == "~/some/path"
 
 
-def test_destination_heuristic_empty(data):
-    for entry in data:
-        if "file" in entry.get("fields", []):
-            del entry["fields"]["file"]
+def test_destination_heuristic_empty():
+    data = pybibs.read_string(
+        """
+        @article{a,
+        }
+        """
+    )
     with pytest.raises(click.ClickException, match=".*no paths in the database") as e:
         internals.destination_heuristic(data)
 
 
-def test_destination_heuristic_multiple_equaly_valid_paths(data):
-    for i, entry in enumerate(data):
-        if "fields" in entry:
-            entry["fields"]["file"] = "/fake/path{}/file".format(i)
+def test_destination_heuristic_multiple_equaly_valid_paths():
+    data = pybibs.read_string(
+        """
+        @article{a,
+            file = {~/some/path/a.pdf},
+        }
+
+        @article{b,
+            file = {~/other/path/b.pdf},
+        }
+        """
+    )
     with pytest.raises(
         click.ClickException,
         match=".*there are multiple equally valid paths in the database",
     ) as e:
-        internals.destination_heuristic(data)
+        print(internals.destination_heuristic(data))
 
 
-def test_set_file_with_destination(data, example_pdf, tmpdir):
+def test_set_file_with_destination(example_pdf, tmpdir):
+    data = pybibs.read_string(
+        """
+        @book{tolkien1937hobit,
+            year = {1937},
+            title = {The Hobbit},
+            author = {Tolkien, John R. R.},
+        }
+        """
+    )
     entry = data[0]
     destination = tmpdir / "somewhere_else"
     os.mkdir(str(destination))
@@ -42,7 +74,16 @@ def test_get_database():
     assert internals.get_database(args) == "test.bib"
 
 
-def test_format_entry(data):
+def test_format_entry():
+    data = pybibs.read_string(
+        """
+        @book{tolkien1937hobit,
+            year = {1937},
+            title = {The Hobbit},
+            author = {Tolkien, John R. R.},
+        }
+        """
+    )
     entry = data[0]
     assert internals.format_entry(entry, "$year") == "1937"
     assert internals.format_entry(entry, "$year: $title") == "1937: The Hobbit"

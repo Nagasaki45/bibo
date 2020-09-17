@@ -78,13 +78,13 @@ def destination_heuristic(data):
         )
 
     # Find the paths that appears most often
-    sorted_paths = sorted(counter, reverse=True)
-    groupby = itertools.groupby(sorted_paths, key=len)
+    sorted_paths = counter.most_common()
+    groupby = itertools.groupby(sorted_paths, key=lambda x: x[1])
     _, group = next(groupby)
 
     # We know that there's at least one candidate. Make sure it's
     # the only one
-    candidate = next(group)
+    candidate, _ = next(group)
     try:
         next(group)
     except StopIteration:

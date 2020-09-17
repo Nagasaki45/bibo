@@ -58,10 +58,10 @@ def test_list_with_search_by_field(runner, database):
     assert "The lord of the rings" in result.output
 
 
-def test_list_with_no_arguments_to_get_everything(runner, database, data):
+def test_list_with_no_arguments_to_get_everything(runner, database):
     args = ["--database", database, "list"]
     result = runner.invoke(bibo.cli, args)
-    for entry in data:
+    for entry in pybibs.read_file(database):
         if entry["type"] not in ["string", "comment", "preamble"]:
             assert entry["key"] in result.output
 

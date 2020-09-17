@@ -27,8 +27,3 @@ def example_pdf(tmpdir):
 @pytest.fixture()
 def runner():
     return click.testing.CliRunner()
-
-
-@pytest.fixture()
-def data(database):
-    return pybibs.read_file(database)
