@@ -55,7 +55,7 @@ def _match(entry, search_term: str):
         # Allow query by field with no value (e.g. bibo list readdate:)
         else:
             d.setdefault("fields", {}).setdefault(search_field, set())
-    else:
+    elif search_field is None:
         for part in ["key", "type"]:
             _match_field(part, entry[part], search_value, lambda: d)
         for field, value in entry.get("fields", {}).items():

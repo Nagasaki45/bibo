@@ -67,11 +67,8 @@ def test_search_specific_field():
             author = {Tolkien, John R. R.},
         }
 
-        @trilogy{tolkien1954lord,
-            title={The Lord of the Rings},
-            author={Tolkien, John Ronald Reuel},
-            year={1954},
-            publisher={Best books since 1937},
+        @article{1937history,
+            title = {What happened in 1937?},
         }
         """
     )
