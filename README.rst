@@ -3,8 +3,8 @@
 
 Command line reference manager with a single source of truth: the ``.bib`` file. Inspired by `beets`_.
 
-.. image:: https://travis-ci.org/Nagasaki45/bibo.svg?branch=master
-    :target: https://travis-ci.org/Nagasaki45/bibo
+.. image:: https://travis-ci.com/Nagasaki45/bibo.svg?branch=master
+    :target: https://travis-ci.com/Nagasaki45/bibo
 
 .. image:: https://codecov.io/gh/Nagasaki45/bibo/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/Nagasaki45/bibo
