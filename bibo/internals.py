@@ -205,17 +205,39 @@ def bold(s: str) -> str:
     return "{}{}{}".format(_ANSI_BOLD, s, _ANSI_UNBOLD)
 
 
-def highlight_text(text, highlight):
+def highlight_text(text: str, highlight: str) -> str:
     """
     Return `text` with sub-string `highlight` in bold.
     """
+    # This is tricky because `text` might contain ANSI escape characters
+    # that shouldn't get highlighted. A state machine to track whether
+    # inside an ANSI sequence, and manual replacement with bold if found
+    # otherwise.
+    chars = list(text)
+    n = len(highlight)
 
-    def highlighter(s):
-        return bold(s.group(0))
+    in_ansi = False
+    skip = 0
+    res = []
+    for i, char in enumerate(chars):
+        if skip > 0:
+            skip -= 1
+            continue
 
-    text = re.sub(highlight, highlighter, text, flags=re.IGNORECASE)
-    # Drop ANSI unbold followed by ANSI bold
-    return text.replace(_ANSI_UNBOLD + _ANSI_BOLD, "")
+        if not in_ansi and char == "\033":
+            in_ansi = True
+
+        candidate = "".join(chars[i : i + n])
+        if not in_ansi and candidate.lower() == highlight.lower():
+            res.append(bold(candidate))
+            skip = n - 1
+        else:
+            res.append(char)
+
+        if in_ansi and char == "m":
+            in_ansi = False
+
+    return "".join(res).replace(_ANSI_UNBOLD + _ANSI_BOLD, "")
 
 
 def highlight_match(

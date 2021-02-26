@@ -165,3 +165,13 @@ def test_highlight_match_case_insensitive():
     text, extra_match_info = internals.highlight_match(text, result)
     assert text == internals.bold("Turn-taking")
     assert extra_match_info == {}
+
+
+def test_highlight_text_escapes_ansi():
+    # Testing issue #78
+    text = click.style("Green text", fg="green")
+    assert "3" in text  # because it's part of the ANSI code for green
+    assert internals.highlight_text(text, "3") == text
+
+    assert "m" in text  # because it's part of the ANSI code for green
+    assert internals.highlight_text(text, "m") == text
