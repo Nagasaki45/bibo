@@ -1,5 +1,5 @@
 import os
-import shutil
+from unittest import mock
 
 import click
 import pytest  # type: ignore
@@ -69,19 +69,22 @@ def test_set_file_with_destination(example_pdf, tmpdir):
     internals.set_file(data, entry, example_pdf, str(destination))
     assert os.path.exists(str(destination / entry["key"] + ".pdf"))
 
-def test_set_file_exists_already(data, example_pdf, tmpdir):
+
+def test_set_file_exists_already(tmpdir):
+    data = pybibs.read_string(
+        """
+        @book{key,
+            title=title,
+        }
+        """
+    )
     entry = data[0]
-    # Create an existing pdf, specified by user as relative path
-    ext = os.path.splitext(example_pdf)[1]
-    dest = tmpdir / 'subdir'
-    os.mkdir(dest.strpath)
-    existing_pdf = shutil.copyfile(example_pdf, dest.join(entry['key'] + ext))
-    relative_file = os.path.join('subdir', os.path.basename(existing_pdf))
-    with tmpdir.as_cwd():
-        try:
-            internals.set_file(data, entry, relative_file, dest.strpath)
-        except shutil.SameFileError as e:
-            pytest.fail('Raised {}'.format(repr(e)))
+    existing_file = tmpdir / "key.txt"
+    existing_file.write("content")
+    with mock.patch("shutil.copy") as copy_mock:
+        internals.set_file(data, entry, existing_file.strpath, tmpdir)
+        assert not copy_mock.called
+
 
 def test_get_database():
     args = ["whatever", "--database", "test.bib", "whatever"]
