@@ -1,5 +1,4 @@
 import os
-from unittest import mock
 
 import click
 import pytest  # type: ignore
@@ -81,9 +80,8 @@ def test_set_file_exists_already(tmpdir):
     entry = data[0]
     existing_file = tmpdir / "key.txt"
     existing_file.write("content")
-    with mock.patch("shutil.copy") as copy_mock:
+    with pytest.raises(click.ClickException, match=".* already exists"):
         internals.set_file(data, entry, existing_file.strpath, tmpdir)
-        assert not copy_mock.called
 
 
 def test_get_database():
