@@ -25,13 +25,11 @@ FILE_OPTIONS = internals.combine_decorators(
             "--file",
             help="Path to file to link to this entry.",
             type=click.Path(exists=True, readable=True, dir_okay=False),
-            autocompletion=internals.complete_path,
         ),
         click.option(
             "--destination",
             help="A folder to put the file in.",
             type=click.Path(exists=True, readable=True, dir_okay=True, file_okay=False),
-            autocompletion=internals.complete_path,
         ),
         click.option(
             "--no-copy",
@@ -64,7 +62,6 @@ A path to a .bib file. Overrides the BIBO_DATABASE environment variable.
 """,
     required=True,
     type=PATH_OPTION,
-    autocompletion=internals.complete_path,
 )
 @click.pass_context
 def cli(ctx, database):

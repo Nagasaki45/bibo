@@ -2,7 +2,6 @@
 
 import collections
 import collections.abc
-import glob
 import itertools
 import os
 import re
@@ -187,19 +186,6 @@ def bib_entries(entries):
 def unique_key_validation(new_key, data):
     if new_key in (e["key"] for e in bib_entries(data)):
         raise click.ClickException("Duplicate key, command aborted")
-
-
-def complete_path(ctx, args, incomplete):
-    """
-    Autocompletion for files, matches the glob of incomplete argument, and
-    provide basename prompts.
-    """
-    wildc_path = os.path.expanduser(os.path.expandvars(incomplete)) + "*"
-    options = []
-    for path in glob.glob(wildc_path):
-        if os.access(path, os.R_OK):
-            options.append((path, os.path.basename(path)))
-    return options
 
 
 def bold(s: str) -> str:

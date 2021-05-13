@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - #53: Fail gracefully if trying to copy over existing file (e.g. with `add --file`).
 
+### Changed
+
+- #64: Use click's path completion instead of our own.
+
 ## [0.1.4] - 2021-03-04
 
 ### Added
