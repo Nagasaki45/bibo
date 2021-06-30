@@ -3,9 +3,7 @@ Command line reference manager with a single source of truth: the .bib file.
 Inspired by beets.
 """
 
-import os
 import pkg_resources
-import sys
 
 import click
 import click_constraints
@@ -18,7 +16,6 @@ from . import cite
 from . import internals
 from . import query
 
-PATH_OPTION = click.Path(writable=True, readable=True, dir_okay=False)
 FILE_OPTIONS = internals.combine_decorators(
     [
         click.option(
@@ -61,12 +58,18 @@ SEARCH_TERMS_OPTION = click.argument(
 A path to a .bib file. Overrides the BIBO_DATABASE environment variable.
 """,
     required=True,
-    type=PATH_OPTION,
+    type=click.Path(
+        file_okay=True,
+        dir_okay=False,
+        writable=True,
+        readable=True,
+        resolve_path=True,
+    ),
 )
 @click.pass_context
 def cli(ctx, database):
     ctx.ensure_object(dict)
-    ctx.obj["database"] = os.path.abspath(database)
+    ctx.obj["database"] = database
     ctx.obj["data"] = internals.load_database(database)
 
 

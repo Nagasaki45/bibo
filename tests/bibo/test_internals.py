@@ -84,11 +84,6 @@ def test_set_file_exists_already(tmpdir):
         internals.set_file(data, entry, existing_file.strpath, tmpdir)
 
 
-def test_get_database():
-    args = ["whatever", "--database", "test.bib", "whatever"]
-    assert internals.get_database(args) == "test.bib"
-
-
 def test_format_entry():
     data = pybibs.read_string(
         """

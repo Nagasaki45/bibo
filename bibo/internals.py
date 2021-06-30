@@ -134,23 +134,17 @@ def editor(*args, **kwargs):
     return result
 
 
-def get_database(args):
-    for arg_a, arg_b in zip(args, args[1:]):
-        if arg_a == "--database":
-            return arg_b
-
-
-def complete_key(ctx, args, incomplete):
+def complete_key(ctx, param, incomplete):
     """
     Autocompletion for keys.
     """
-    database = get_database(args) or os.environ.get(BIBO_DATABASE_ENV_VAR)
+    database = ctx.parent.params.get("database")
     if database:
         data = load_database(database)
     else:
         data = []
     data = bib_entries(data)
-    return [x["key"] for x in data if incomplete.lower() in x["key"].lower()]
+    return [x["key"] for x in data if x["key"].startswith(incomplete.lower())]
 
 
 def load_database(database):
