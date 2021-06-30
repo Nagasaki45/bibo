@@ -85,6 +85,8 @@ setup(
             "pytest-mypy",
             "sphinx",
             "sphinx-click",
+            "types-requests",
+            "types-setuptools",
         ],
     },
     # To provide executable scripts, use entry points in preference to the
