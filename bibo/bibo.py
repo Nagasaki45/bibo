@@ -9,6 +9,7 @@ import click
 import click_constraints
 import click_plugins  # type: ignore
 import pybibs
+import pylatexenc.latex2text
 import pyperclip  # type: ignore
 import requests
 
@@ -137,6 +138,8 @@ def _list_citations(results, database, bibstyle, verbose):
     except cite.BibtexException as e:
         exception = e
 
+    latex_converter = pylatexenc.latex2text.LatexNodes2Text()
+
     for result in results:
         header = internals.header(result.entry)
         if exception:
@@ -144,6 +147,7 @@ def _list_citations(results, database, bibstyle, verbose):
         else:
             citation = citations[result.entry["key"]]
 
+        citation = latex_converter.latex_to_text(citation)
         text = "\n".join([header, citation])
         text, extra_match_info = internals.highlight_match(text, result)
 
@@ -152,7 +156,7 @@ def _list_citations(results, database, bibstyle, verbose):
         if extra_match_info:
             click.secho("Search matched by", underline=True)
         for key, val in extra_match_info.items():
-            click.echo("{}: {}".format(key, val))
+            click.echo(f"{key}: {latex_converter.latex_to_text(val)}")
 
     if exception is not None:
         parts = [str(exception), "Using a fallback citation method"]

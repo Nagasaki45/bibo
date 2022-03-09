@@ -87,6 +87,19 @@ def test_list_extra_match_info(runner, database):
     assert "url: " in result.output
 
 
+def test_list_citation_is_unicode(runner, database):
+    args = ["--database", database, "list", "accents"]
+    result = runner.invoke(bibo.cli, args)
+    assert "Athénaïs" in result.output
+
+
+def test_list_extra_info_is_unicode(runner, database):
+    args = ["--database", database, "list", "neumann"]
+    result = runner.invoke(bibo.cli, args)
+    assert "matched by" in result.output
+    assert "Königshausen & Neumann" in result.output
+
+
 def test_open(runner, database):
     with mock.patch("click.launch") as launch_mock:
         args = ["--database", database, "open", "tolkien1937"]

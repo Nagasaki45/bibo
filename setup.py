@@ -71,6 +71,7 @@ setup(
         "click>=8",
         "click-plugins",
         "requests",
+        "pylatexenc",
         "pyperclip",
     ],
     extras_require={
