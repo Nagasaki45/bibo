@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - #82: Convert latex to unicode when listing entries.
+- Python 3.10 support.
 
 ## [0.1.6] - 2021-06-30
 
