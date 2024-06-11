@@ -13,6 +13,7 @@ import click
 import pybibs
 
 from . import models
+from typing import Optional
 
 BIBO_DATABASE_ENV_VAR = "BIBO_DATABASE"
 _ANSI_BOLD = "\033[1m"
@@ -223,7 +224,7 @@ def highlight_text(text: str, highlight: str) -> str:
 
 
 def highlight_match(
-    text: str, result: models.SearchResult, extra_match_info: dict = None
+    text: str, result: models.SearchResult, extra_match_info: Optional[dict] = None
 ) -> typing.Tuple[str, dict]:
     """
     Highlight `text` with `result.match` info. Every bit of info that is in

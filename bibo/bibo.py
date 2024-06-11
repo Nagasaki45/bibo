@@ -9,7 +9,7 @@ import click
 import click_constraints
 import click_plugins  # type: ignore
 import pybibs
-import pylatexenc.latex2text
+import pylatexenc.latex2text  # type: ignore
 import pyperclip  # type: ignore
 import requests
 

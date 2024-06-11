@@ -1,0 +1,93 @@
+name: CI Pipeline
+
+on: [push]
+
+jobs:
+  test:
+    name: Test 🧪
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup BibTex
+        uses: teatimeguest/setup-texlive-action@v3
+        with:
+          packages: bibtex
+
+      - name: Setup OS dependencies
+        run: sudo apt-get -yqq install xclip xvfb
+
+      - name: Install dependencies
+        run: pip install .[dev]
+
+      - name: Check code formatting
+        run: black . --check
+
+      - name: Run type check
+        run: mypy . --exclude build
+
+      - name: Run unit tests with Xvfb, necessary for clipboard tests
+        run: xvfb-run coverage run -m pytest
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  build:
+    name: Build distribution 📦
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install pypa/build
+        run: pip install build
+
+      - name: Build a binary wheel and a source tarball
+        run: python -m build
+
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+    name: Publish Python 🐍 distribution 📦 to PyPI
+    if: github.ref == 'refs/heads/master'  # only publish to PyPI on pushes to master
+    needs:
+    - test
+    - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/bibo
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

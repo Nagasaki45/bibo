@@ -13,14 +13,16 @@ Then, preferably in a virtual environment, run
     pip install -e .[dev]
 
 
-Running tests
--------------
+Running tests, code formatting and and type checking
+----------------------------------------------------
 
 .. code-block:: bash
 
     pytest
+    black . --check
+    mypy .
 
-It automatically checks code formatting with `black <https://github.com/psf/black>`_. If code formatting errors are detected they can be manually fixed, or try running ``black .``.
+If code formatting errors are detected they can be manually fixed, or try running ``black .``.
 
 
 Generating the documentation

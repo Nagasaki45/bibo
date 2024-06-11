@@ -61,7 +61,7 @@ setup(
     #
     #   py_modules=["my_module"],
     #
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests*"]),
     # This field lists other packages that your project depends on to run.
     # Any package you put here will be installed by pip when your project is
     # installed, so they must be valid existing projects.
@@ -83,8 +83,6 @@ setup(
             "codecov",
             "mypy",
             "pytest",
-            "pytest-black",
-            "pytest-mypy",
             "sphinx",
             "sphinx-click",
             "types-requests",
