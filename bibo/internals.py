@@ -2,10 +2,12 @@
 
 import collections
 import collections.abc
+import importlib.metadata
 import itertools
 import os
 import re
 import shutil
+import sys
 import typing
 
 import click
@@ -253,3 +255,15 @@ def highlight_match(
                     extra_match_val = highlight_text(extra_match_val, val)
                     extra_match_info[key] = extra_match_val
     return text, extra_match_info
+
+
+def get_plugins():
+    """
+    Return a list of EntryPoint objects for group "bibo.plugins".
+    """
+    group = "bibo.plugins"
+    eps = importlib.metadata.entry_points()
+    if sys.version_info >= (3, 12):
+        return eps.select(group=group)
+    else:
+        return eps.get(group, [])

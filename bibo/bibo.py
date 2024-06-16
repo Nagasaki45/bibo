@@ -3,8 +3,6 @@ Command line reference manager with a single source of truth: the .bib file.
 Inspired by beets.
 """
 
-import pkg_resources
-
 import click
 import click_constraints
 import click_plugins  # type: ignore
@@ -49,7 +47,7 @@ SEARCH_TERMS_OPTION = click.argument(
 )
 
 
-@click_plugins.with_plugins(pkg_resources.iter_entry_points("bibo.plugins"))
+@click_plugins.with_plugins(internals.get_plugins())
 @click.group(help=__doc__)
 @click.version_option()
 @click.option(
