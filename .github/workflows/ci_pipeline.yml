@@ -42,28 +42,11 @@ jobs:
       - name: Run unit tests with Xvfb (necessary for clipboard tests) and coverage
         run: xvfb-run coverage run -m pytest
 
-      - name: Store the coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report-${{ matrix.python-version }}
-          path: .coverage
-
-  publish-coverage:
-    name: Publish coverage report 📊 to Codecov
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Download the coverage reports
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-report-${{ env.MAIN_PYTHON }}
-
       - name: Publish coverage report
+        if: matrix.python-version == env.MAIN_PYTHON
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
-          files: .coverage
           token: ${{ secrets.CODECOV_TOKEN }}
 
   build:
