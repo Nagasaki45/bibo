@@ -80,7 +80,6 @@ setup(
             "black",
             "bumpversion",
             "coverage",
-            "codecov",
             "mypy",
             "pytest",
             "sphinx",

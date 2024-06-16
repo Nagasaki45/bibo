@@ -2,6 +2,9 @@ name: CI Pipeline
 
 on: [push]
 
+env:
+  MAIN_PYTHON: "3.9"
+
 jobs:
   test:
     name: Test 🧪
@@ -36,13 +39,31 @@ jobs:
       - name: Run type check
         run: mypy . --exclude build
 
-      - name: Run unit tests with Xvfb, necessary for clipboard tests
+      - name: Run unit tests with Xvfb (necessary for clipboard tests) and coverage
         run: xvfb-run coverage run -m pytest
 
-      - name: Upload coverage report
+      - name: Store the coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-${{ matrix.python-version }}
+          path: .coverage
+
+  publish-coverage:
+    name: Publish coverage report 📊 to Codecov
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Download the coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report-${{ env.MAIN_PYTHON }}
+
+      - name: Publish coverage report
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
+          files: .coverage
           token: ${{ secrets.CODECOV_TOKEN }}
 
   build:
@@ -53,10 +74,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup python 3.9
+      - name: Setup python ${{ env.MAIN_PYTHON }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: ${{ env.MAIN_PYTHON }}
 
       - name: Install pypa/build
         run: pip install build
@@ -65,29 +86,30 @@ jobs:
         run: python -m build
 
       - name: Store the distribution packages
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
 
   publish-to-pypi:
     name: Publish Python 🐍 distribution 📦 to PyPI
-    if: github.ref == 'refs/heads/master'  # only publish to PyPI on pushes to master
+    if: github.ref == 'refs/heads/master' # only publish to PyPI on pushes to master
     needs:
-    - test
-    - build
+      - test
+      - build
     runs-on: ubuntu-latest
     environment:
       name: pypi
       url: https://pypi.org/p/bibo
     permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+      id-token: write # IMPORTANT: mandatory for trusted publishing
 
     steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
